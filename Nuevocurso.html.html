@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentación Interactiva: R y RStudio en Salud Pública</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            color: #073B4C;
+        }
+        .slide {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .slide.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 90%;
+            max-height: 450px;
+        }
+        .detective-card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.06);
+            border-top: 5px solid #118AB2;
+        }
+        .nav-button {
+            background-color: #118AB2;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        .nav-button:hover {
+            background-color: #06D6A0;
+            transform: translateY(-2px);
+        }
+        .nav-button:disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen justify-center items-center p-4">
+
+    <!-- 
+    Plan de la Presentación y Selección de Visualizaciones
+    Paleta de Colores: Energetic & Playful (#FF6B6B, #FFD166, #06D6A0, #118AB2, #073B4C)
+    Estructura Narrativa: Guiada por dos detectives de datos, Sofía y Mateo. Cada sección es una "pista".
+    Confirmación: NO SVG, NO Mermaid JS. Todo renderizado vía HTML/CSS/Canvas.
+    -->
+
+    <div class="w-full max-w-6xl mx-auto">
+        <main id="presentation-container" class="relative min-h-[70vh] mb-8">
+            
+            <!-- Slide 0: Portada -->
+            <div class="slide active">
+                <div class="text-center p-8">
+                    <h1 class="text-4xl md:text-6xl font-black text-[#073B4C] mb-4">El Misterio de los Datos en Salud</h1>
+                    <p class="text-xl text-[#118AB2] max-w-3xl mx-auto">Una investigación guiada por los detectives Sofía y Mateo para aprender a usar <span class="font-bold">R</span> y <span class="font-bold">RStudio</span>.</p>
+                    <div class="flex flex-col md:flex-row justify-center items-center gap-8 mt-8">
+                        <!-- Imagen de Sofía con ruta local -->
+                        <img src="imagenes/sofia.png" alt="Ilustración de la detective de datos Sofía, mujer con características latinoamericanas" class="rounded-lg shadow-lg h-64">
+                        <!-- Imagen de Mateo con ruta local -->
+                        <img src="imagenes/mateo.png" alt="Ilustración del detective de datos Mateo, hombre con características latinoamericanas" class="rounded-lg shadow-lg h-64">
+                    </div>
+                    <p class="mt-6 text-lg">¿Listos para resolver el caso?</p>
+                </div>
+            </div>
+
+            <!-- Slide 1: Pista #1 - Las Herramientas -->
+            <div class="slide">
+                <div class="detective-card grid md:grid-cols-2 gap-8 items-center">
+                    <div class="text-center md:text-left">
+                        <h2 class="text-3xl font-bold mb-4">Pista #1: Las Herramientas del Oficio</h2>
+                        <p class="mb-6">Soy Mateo. Todo buen detective necesita su kit. En nuestro caso, no son lupas, sino software potente. Estas son nuestras tres herramientas clave para interrogar a los datos hasta que confiesen la verdad.</p>
+                        <div class="space-y-4">
+                             <div class="p-4 bg-gray-100 rounded-lg"><strong class="text-[#FF6B6B]">R:</strong> El cerebro de la operación. Un lenguaje para análisis estadístico.</div>
+                             <div class="p-4 bg-gray-100 rounded-lg"><strong class="text-[#FFD166]">RStudio:</strong> Nuestro cuartel general. La interfaz que organiza todo.</div>
+                             <div class="p-4 bg-gray-100 rounded-lg"><strong class="text-[#06D6A0]">Tidyverse:</strong> El kit de ganzúas. Simplifica la manipulación de datos.</div>
+                        </div>
+                    </div>
+                    <!-- Placeholder de Mateo actualizado para simular la imagen local -->
+                    <img src="imagenes/mateo.png" alt="Detective Mateo señalando las herramientas" class="rounded-lg shadow-md w-full max-w-sm mx-auto">
+                </div>
+            </div>
+            
+            <!-- Slide 2: Pista #2 - El Escenario -->
+            <div class="slide">
+                    <div class="detective-card grid md:grid-cols-2 gap-8 items-center">
+                        <!-- Imagen de Sofía con ruta local -->
+                        <img src="imagenes/sofia.png" alt="Detective Sofía presentando un gráfico" class="rounded-lg shadow-md h-96 mx-auto order-last md:order-first">
+                        <div class="text-center md:text-left">
+                            <h2 class="text-3xl font-bold mb-2">Pista #2: La Escena del Crimen</h2>
+                            <p class="mb-4">Aquí Sofía. Los datos nos llevan a distintos lugares. R y RStudio son cruciales en el campo de la salud pública. Este gráfico muestra dónde dejan sus huellas más importantes.</p>
+                            <div class="chart-container h-[400px]">
+                                <canvas id="applicationsChart"></canvas>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2">Observa cómo el 'Análisis Cuantitativo' y la 'Visualización' son las áreas de mayor impacto. Ahí es donde encontraremos las pistas más jugosas.</p>
+                        </div>
+                    </div>
+            </div>
+
+            <!-- Slide 3: Pista #3 - El Camino del Investigador -->
+            <div class="slide">
+                <div class="detective-card text-center">
+                    <h2 class="text-3xl font-bold mb-6">Pista #3: El Camino del Investigador</h2>
+                    <p class="max-w-3xl mx-auto mb-8">Mateo de nuevo. Todo investigador sigue un método. Este es el nuestro. Seguiremos estos tres pasos para pasar de novatos a analistas competentes.</p>
+                     <div class="flex flex-col md:flex-row items-stretch justify-center gap-4 text-center">
+                        <div class="flex-1 p-6 bg-white rounded-lg shadow-md border-l-4 border-[#FF6B6B]">
+                            <div class="text-4xl mb-2">1️⃣</div>
+                            <h3 class="font-bold text-lg">Preparación</h3>
+                            <p class="text-sm text-gray-600">Reunir el equipo. Instalar y cargar los paquetes necesarios.</p>
+                        </div>
+                        <div class="text-4xl self-center mx-4 text-[#118AB2]">→</div>
+                        <div class="flex-1 p-6 bg-white rounded-lg shadow-md border-l-4 border-[#FFD166]">
+                            <div class="text-4xl mb-2">2️⃣</div>
+                            <h3 class="font-bold text-lg">Exploración</h3>
+                            <p class="text-sm text-gray-600">Reconocer el terreno. Familiarizarse con RStudio y los datos.</p>
+                        </div>
+                           <div class="text-4xl self-center mx-4 text-[#118AB2]">→</div>
+                        <div class="flex-1 p-6 bg-white rounded-lg shadow-md border-l-4 border-[#06D6A0]">
+                            <div class="text-4xl mb-2">3️⃣</div>
+                            <h3 class="font-bold text-lg">Aplicación</h3>
+                            <p class="text-sm text-gray-600">Resolver el caso. Usar `tidyverse` para analizar y visualizar.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 4: Pista #4 - Las Habilidades -->
+            <div class="slide">
+                    <div class="detective-card grid md:grid-cols-2 gap-8 items-center">
+                        <div class="text-center md:text-left">
+                            <h2 class="text-3xl font-bold mb-2">Pista #4: El Perfil del Experto</h2>
+                            <p class="mb-4">Soy Sofía. Para ser un gran detective de datos, necesitas un conjunto de habilidades equilibrado. Este informe revela las competencias clave que desarrollarás. Presta atención a la distribución.</p>
+                            <div class="chart-container h-[400px]">
+                                <canvas id="skillsChart"></canvas>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2">Dominar las funciones de `tidyverse` y las estructuras de R es casi el 70% del trabajo. Ahí está la clave del éxito.</p>
+                        </div>
+                        <!-- Imagen de Sofía con ruta local -->
+                        <img src="imagenes/sofia.png" alt="Detective Sofía analizando un donut chart" class="rounded-lg shadow-md h-96 mx-auto">
+                    </div>
+            </div>
+
+            <!-- Slide 5: Caso Resuelto -->
+            <div class="slide">
+                <div class="text-center p-8">
+                    <h1 class="text-4xl md:text-6xl font-black text-[#073B4C] mb-4">Caso Resuelto (por ahora)</h1>
+                    <p class="text-xl text-[#118AB2] max-w-3xl mx-auto">¡Felicidades, detective! Has completado la introducción. Has visto las herramientas, el escenario y el método.</p>
+                     <div class="flex flex-col md:flex-row justify-center items-center gap-8 mt-8">
+                        <!-- Imagen de Sofía con ruta local -->
+                        <img src="imagenes/sofia.png" alt="Ilustración de la detective Sofía sonriendo" class="rounded-lg shadow-lg h-64">
+                        <!-- Imagen de Mateo con ruta local -->
+                        <img src="imagenes/mateo.png" alt="Ilustración del detective Mateo dando un pulgar arriba" class="rounded-lg shadow-lg h-64">
+                    </div>
+                    <p class="mt-6 text-lg">Este es solo el comienzo de tu carrera. El mundo de los datos en salud pública está lleno de misterios por resolver. ¡Sigue investigando!</p>
+                </div>
+            </div>
+        </main>
+
+        <nav class="flex justify-between items-center w-full max-w-xl mx-auto">
+            <button id="prevBtn" class="nav-button">Anterior</button>
+            <div id="slide-counter" class="text-sm font-bold"></div>
+            <button id="nextBtn" class="nav-button">Siguiente</button>
+        </nav>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let currentSlide = 0;
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const slideCounter = document.getElementById('slide-counter');
+            const totalSlides = slides.length;
+            const charts = {};
+
+            function wrapLabels(label, maxWidth) {
+                if (typeof label !== 'string' || label.length <= maxWidth) return label;
+                const words = label.split(' ');
+                let lines = [];
+                let currentLine = '';
+                words.forEach(word => {
+                    if ((currentLine + word).length > maxWidth) {
+                        lines.push(currentLine.trim());
+                        currentLine = '';
+                    }
+                    currentLine += word + ' ';
+                });
+                lines.push(currentLine.trim());
+                return lines.filter(Boolean);
+            }
+
+            const tooltipTitleCallback = (tooltipItems) => {
+                const item = tooltipItems[0];
+                let label = item.chart.data.labels[item.dataIndex];
+                return Array.isArray(label) ? label.join(' ') : label;
+            };
+
+            const chartConfigs = {
+                applicationsChart: {
+                    type: 'bar',
+                    data: {
+                        labels: ['Gestión de Bases de Datos', 'Visualización de Patrones', 'Automatización de Procesos', 'Modelado de Fenómenos', 'Análisis Cuantitativo'].map(l => wrapLabels(l, 16)),
+                        datasets: [{
+                            label: 'Nivel de Impacto',
+                            data: [85, 95, 75, 90, 100],
+                            backgroundColor: ['#FF6B6B', '#FFD166', '#06D6A0', '#118AB2', '#073B4C'],
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false }, tooltip: { callbacks: { title: tooltipTitleCallback } } },
+                        scales: { x: { beginAtZero: true } }
+                    }
+                },
+                skillsChart: {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Componentes RStudio', 'Estructuras R', 'Funciones Tidyverse'],
+                        datasets: [{
+                            data: [30, 35, 35],
+                            backgroundColor: ['#118AB2', '#06D6A0', '#FFD166'],
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { title: tooltipTitleCallback } } }
+                    }
+                }
+            };
+            
+            function initializeChart(canvasId) {
+                if (charts[canvasId] || !chartConfigs[canvasId]) return;
+                const ctx = document.getElementById(canvasId).getContext('2d');
+                charts[canvasId] = new Chart(ctx, chartConfigs[canvasId]);
+            }
+
+            function updateNav() {
+                slideCounter.textContent = `${currentSlide + 1} / ${totalSlides}`;
+                prevBtn.disabled = currentSlide === 0;
+                nextBtn.disabled = currentSlide === totalSlides - 1;
+                
+                if (currentSlide === 0) {
+                  prevBtn.style.visibility = 'hidden';
+                } else {
+                  prevBtn.style.visibility = 'visible';
+                }
+
+                if (currentSlide === totalSlides - 1) {
+                  nextBtn.textContent = 'Finalizar';
+                } else {
+                  nextBtn.textContent = 'Siguiente';
+                }
+            }
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+                
+                const activeSlide = slides[index];
+                const canvas = activeSlide.querySelector('canvas');
+                if (canvas) {
+                    initializeChart(canvas.id);
+                }
+
+                updateNav();
+            }
+
+
+            nextBtn.addEventListener('click', () => {
+                if (currentSlide < totalSlides - 1) {
+                    currentSlide++;
+                    showSlide(currentSlide);
+                }
+            });
+
+            prevBtn.addEventListener('click', () => {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    showSlide(currentSlide);
+                }
+            });
+            
+            showSlide(currentSlide);
+        });
+    </script>
+</body>
+</html>
