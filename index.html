@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Presentación Interactiva: R y RStudio en Salud Pública</title>
+    <title>Página Web: R y RStudio en Salud Pública</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,19 +12,21 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8;
-            color: #073B4C;
+            background-color: #EBE6E0; /* Light Gray/Off-white */
+            color: #071E2D; /* Dark Blue */
+            scroll-behavior: smooth; /* Smooth scrolling for navigation */
+            padding-top: 5rem; /* Space for fixed header */
         }
-        .slide {
-            display: none;
-            animation: fadeIn 0.5s ease-in-out;
+        .section-padding {
+            padding: 4rem 1rem; /* Consistent padding for all sections */
         }
-        .slide.active {
-            display: block;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .detective-card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.06);
+            border-top: 5px solid #106BA0; /* Medium Blue */
+            margin-bottom: 2rem; /* Spacing between cards */
         }
         .chart-container {
             position: relative;
@@ -32,15 +34,40 @@
             height: 90%;
             max-height: 450px;
         }
-        .detective-card {
-            background-color: #ffffff;
-            border-radius: 0.75rem;
-            padding: 2rem;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.06);
-            border-top: 5px solid #118AB2;
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #071E2D; /* Dark Blue */
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        .fixed-header nav a {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .fixed-header nav a:hover {
+            background-color: #106BA0; /* Medium Blue */
+            color: white;
+        }
+        /* Specific styles for slides within containers */
+        .slide-container .slide {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .slide-container .slide.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .nav-button {
-            background-color: #118AB2;
+            background-color: #106BA0; /* Medium Blue */
             color: white;
             padding: 0.75rem 1.5rem;
             border-radius: 9999px;
@@ -49,150 +76,1599 @@
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
         .nav-button:hover {
-            background-color: #06D6A0;
+            background-color: #AEC800; /* Lime Green */
             transform: translateY(-2px);
         }
         .nav-button:disabled {
-            background-color: #a0aec0;
+            background-color: #888888; /* Gray */
             cursor: not-allowed;
             transform: translateY(0);
         }
     </style>
 </head>
-<body class="flex flex-col min-h-screen justify-center items-center p-4">
+<body>
 
-    <!-- 
-    Plan de la Presentación y Selección de Visualizaciones
-    Paleta de Colores: Energetic & Playful (#FF6B6B, #FFD166, #06D6A0, #118AB2, #073B4C)
-    Estructura Narrativa: Guiada por dos detectives de datos, Sofía y Mateo. Cada sección es una "pista".
-    Confirmación: NO SVG, NO Mermaid JS. Todo renderizado vía HTML/CSS/Canvas.
-    -->
+    <!-- Fixed Header Navigation -->
+    <header class="fixed-header">
+        <div class="container mx-auto flex flex-wrap justify-center gap-4 text-sm md:text-base">
+            <a href="#bienvenida">Bienvenida</a>
+            <a href="#tema1">Tema 1</a>
+            <a href="#tema2">Tema 2</a>
+            <a href="#tema3">Tema 3</a>
+            <a href="#tema4">Tema 4</a>
+            <a href="#tema5">Tema 5</a>
+            <a href="#tema6">Tema 6</a>
+            <a href="#tema7">Tema 7</a>
+            <a href="#tema8">Tema 8</a>
+            <a href="#tema9">Tema 9</a>
+            <a href="#reto">Reto</a>
+            <a href="#evaluacion">Evaluación</a>
+            <a href="#despedida">Despedida</a>
+            <a href="#bibliografia">Bibliografía</a>
+        </div>
+    </header>
 
-    <div class="w-full max-w-6xl mx-auto">
-        <main id="presentation-container" class="relative min-h-[70vh] mb-8">
-            
-            <!-- Slide 0: Portada -->
-            <div class="slide active">
-                <div class="text-center p-8">
-                    <h1 class="text-4xl md:text-6xl font-black text-[#073B4C] mb-4">El Misterio de los Datos en Salud</h1>
-                    <p class="text-xl text-[#118AB2] max-w-3xl mx-auto">Una investigación guiada por los detectives Sofía y Mateo para aprender a usar <span class="font-bold">R</span> y <span class="font-bold">RStudio</span>.</p>
-                    <div class="flex flex-col md:flex-row justify-center items-center gap-8 mt-8">
-                        <!-- Imagen de Sofía con ruta local -->
-                        <img src="imagenes/sofia.png" alt="Ilustración de la detective de datos Sofía, mujer con características latinoamericanas" class="rounded-lg shadow-lg h-64">
-                        <!-- Imagen de Mateo con ruta local -->
-                        <img src="imagenes/mateo.png" alt="Ilustración del detective de datos Mateo, hombre con características latinoamericanas" class="rounded-lg shadow-lg h-64">
-                    </div>
-                    <p class="mt-6 text-lg">¿Listos para resolver el caso?</p>
-                </div>
-            </div>
-
-            <!-- Slide 1: Pista #1 - Las Herramientas -->
-            <div class="slide">
-                <div class="detective-card grid md:grid-cols-2 gap-8 items-center">
-                    <div class="text-center md:text-left">
-                        <h2 class="text-3xl font-bold mb-4">Pista #1: Las Herramientas del Oficio</h2>
-                        <p class="mb-6">Soy Mateo. Todo buen detective necesita su kit. En nuestro caso, no son lupas, sino software potente. Estas son nuestras tres herramientas clave para interrogar a los datos hasta que confiesen la verdad.</p>
-                        <div class="space-y-4">
-                             <div class="p-4 bg-gray-100 rounded-lg"><strong class="text-[#FF6B6B]">R:</strong> El cerebro de la operación. Un lenguaje para análisis estadístico.</div>
-                             <div class="p-4 bg-gray-100 rounded-lg"><strong class="text-[#FFD166]">RStudio:</strong> Nuestro cuartel general. La interfaz que organiza todo.</div>
-                             <div class="p-4 bg-gray-100 rounded-lg"><strong class="text-[#06D6A0]">Tidyverse:</strong> El kit de ganzúas. Simplifica la manipulación de datos.</div>
+    <main class="w-full max-w-6xl mx-auto">
+        
+        <!-- Sección de Bienvenida (con slides internas) -->
+        <section id="bienvenida" class="section-padding">
+            <div id="bienvenida-slides-container" class="relative min-h-[70vh] mb-8 slide-container">
+                <!-- Slide 0: Portada -->
+                <div class="slide active">
+                    <div class="text-center p-8 mb-12">
+                        <h1 class="text-4xl md:text-6xl font-black text-[#071E2D] mb-4">El Misterio de los Datos en Salud</h1>
+                        <p class="text-xl text-[#10BED2] max-w-3xl mx-auto">Una investigación guiada por los detectives Sofía y Mateo para aprender a usar <span class="font-bold">R</span> y <span class="font-bold">RStudio</span>.</p>
+                        <div class="flex flex-col md:flex-row justify-center items-center gap-8 mt-8">
+                            <img src="imagenes/sofia.jpg" onerror="this.onerror=null;this.src='https://placehold.co/256x256/EBE6E0/071E2D?text=Sofia';" alt="" class="rounded-lg shadow-lg h-64">
+                            <img src="imagenes/mateo.jpg" onerror="this.onerror=null;this.src='https://placehold.co/256x256/EBE6E0/071E2D?text=Mateo';" alt="" class="rounded-lg shadow-lg h-64">
                         </div>
+                        <p class="mt-6 text-lg">¿Listo para unirte a nuestro equipo de detectives, detective?</p>
                     </div>
-                    <!-- Placeholder de Mateo actualizado para simular la imagen local -->
-                    <img src="imagenes/mateo.png" alt="Detective Mateo señalando las herramientas" class="rounded-lg shadow-md w-full max-w-sm mx-auto">
                 </div>
-            </div>
-            
-            <!-- Slide 2: Pista #2 - El Escenario -->
-            <div class="slide">
-                    <div class="detective-card grid md:grid-cols-2 gap-8 items-center">
-                        <!-- Imagen de Sofía con ruta local -->
-                        <img src="imagenes/sofia.png" alt="Detective Sofía presentando un gráfico" class="rounded-lg shadow-md h-96 mx-auto order-last md:order-first">
+
+                <!-- Slide 1: Pista #1 - Las Herramientas -->
+                <div class="slide">
+                    <div class="detective-card grid md:grid-cols-2 gap-8 items-center mb-12">
                         <div class="text-center md:text-left">
-                            <h2 class="text-3xl font-bold mb-2">Pista #2: La Escena del Crimen</h2>
-                            <p class="mb-4">Aquí Sofía. Los datos nos llevan a distintos lugares. R y RStudio son cruciales en el campo de la salud pública. Este gráfico muestra dónde dejan sus huellas más importantes.</p>
-                            <div class="chart-container h-[400px]">
-                                <canvas id="applicationsChart"></canvas>
+                            <h2 class="text-3xl font-bold mb-4">Pista #1: Las Herramientas del Oficio</h2>
+                            <p class="mb-6">Soy Mateo. Todo buen detective necesita su kit, ¿verdad, detective? En nuestro caso, no son lupas, sino software potente. Estas son nuestras tres herramientas clave para interrogar a los datos hasta que confiesen la verdad.</p>
+                            <div class="space-y-4">
+                                    <div class="p-4 bg-gray-100 rounded-lg"><strong class="text-[#F04A4C]">R:</strong> El cerebro de la operación. Un lenguaje para análisis estadístico.</div>
+                                    <div class="p-4 bg-gray-100 rounded-lg"><strong class="text-[#DEFF00]">RStudio:</strong> Nuestro cuartel general. La interfaz que organiza todo.</div>
+                                    <div class="p-4 bg-gray-100 rounded-lg"><strong class="text-[#AEC800]">Tidyverse:</strong> El kit de ganzúas. Simplifica la manipulación de datos.</div>
                             </div>
-                            <p class="text-sm text-gray-500 mt-2">Observa cómo el 'Análisis Cuantitativo' y la 'Visualización' son las áreas de mayor impacto. Ahí es donde encontraremos las pistas más jugosas.</p>
                         </div>
+                        <img src="imagenes/mateo1.jpg" onerror="this.onerror=null;this.src='https://placehold.co/384x384/EBE6E0/071E2D?text=RStudio';" alt="" class="rounded-lg shadow-md w-full max-w-sm mx-auto">
                     </div>
-            </div>
+                </div>
+                
+                <!-- Slide 2: Pista #2 - El Escenario -->
+                <div class="slide">
+                        <div class="detective-card grid md:grid-cols-2 gap-8 items-center mb-12">
+                            <img src="imagenes/sofia1.jpg" onerror="this.onerror=null;this.src='https://placehold.co/384x384/EBE6E0/071E2D?text=Sofia';" alt="" class="rounded-lg shadow-md h-96 mx-auto order-last md:order-first">
+                            <div class="text-center md:text-left">
+                                <h2 class="text-3xl font-bold mb-2">Pista #2: La Escena del Crimen</h2>
+                                <p class="mb-4">Aquí Sofía. Los datos nos llevan a distintas escenas del crimen, ¿estás listo para seguir las huellas, detective? Este gráfico muestra dónde dejan sus huellas más importantes.</p>
+                                <div class="chart-container h-[400px]">
+                                    <canvas id="applicationsChart"></canvas>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-2">Observa cómo el 'Análisis Cuantitativo' y la 'Visualización' son las áreas de mayor impacto. Ahí es donde encontraremos las pistas más jugosas.</p>
+                            </div>
+                        </div>
+                </div>
 
-            <!-- Slide 3: Pista #3 - El Camino del Investigador -->
-            <div class="slide">
-                <div class="detective-card text-center">
-                    <h2 class="text-3xl font-bold mb-6">Pista #3: El Camino del Investigador</h2>
-                    <p class="max-w-3xl mx-auto mb-8">Mateo de nuevo. Todo investigador sigue un método. Este es el nuestro. Seguiremos estos tres pasos para pasar de novatos a analistas competentes.</p>
-                     <div class="flex flex-col md:flex-row items-stretch justify-center gap-4 text-center">
-                        <div class="flex-1 p-6 bg-white rounded-lg shadow-md border-l-4 border-[#FF6B6B]">
-                            <div class="text-4xl mb-2">1️⃣</div>
-                            <h3 class="font-bold text-lg">Preparación</h3>
-                            <p class="text-sm text-gray-600">Reunir el equipo. Instalar y cargar los paquetes necesarios.</p>
+                <!-- Slide 3: Pista #3 - El Camino del Investigador -->
+                <div class="slide">
+                    <div class="detective-card text-center mb-12">
+                        <h2 class="text-3xl font-bold mb-6">Pista #3: El Camino del Investigador</h2>
+                        <p class="max-w-3xl mx-auto mb-8">Mateo de nuevo. Como buen detective, sabes que todo caso se resuelve con un método. Este es nuestro plan de acción para pasar de novatos a analistas competentes.</p>
+                            <div class="flex flex-col md:flex-row items-stretch justify-center gap-4 text-center">
+                                <div class="flex-1 p-6 bg-white rounded-lg shadow-md border-l-4 border-[#F04A4C]">
+                                    <div class="text-4xl mb-2">1️⃣</div>
+                                    <h3 class="font-bold text-lg">Preparación</h3>
+                                    <p class="text-sm text-gray-600">Reunir el equipo. Instalar y cargar los paquetes necesarios.</p>
+                                </div>
+                                <div class="text-4xl self-center mx-4 text-[#10BED2]">→</div>
+                                <div class="flex-1 p-6 bg-white rounded-lg shadow-md border-l-4 border-[#DEFF00]">
+                                    <div class="text-4xl mb-2">2️⃣</div>
+                                    <h3 class="font-bold text-lg">Exploración</h3>
+                                    <p class="text-sm text-gray-600">Reconocer el terreno. Familiarizarse con RStudio y los datos.</p>
+                                </div>
+                                    <div class="text-4xl self-center mx-4 text-[#10BED2]">→</div>
+                                <div class="flex-1 p-6 bg-white rounded-lg shadow-md border-l-4 border-[#AEC800]">
+                                    <div class="text-4xl mb-2">3️⃣</div>
+                                    <h3 class="font-bold text-lg">Aplicación</h3>
+                                    <p class="text-sm text-gray-600">Resolver el caso. Usar `tidyverse` para analizar y visualizar.</p>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+
+                <!-- Slide 4: Pista #4 - Las Habilidades -->
+                <div class="slide">
+                        <div class="detective-card grid md:grid-cols-2 gap-8 items-center mb-12">
+                            <div class="text-center md:text-left">
+                                <h2 class="text-3xl font-bold mb-2">Pista #4: El Perfil del Experto</h2>
+                                <p class="mb-4">Soy Sofía. Para ser un gran detective de datos, necesitarás un conjunto de habilidades equilibrado. Este informe revela las competencias clave que desarrollarás. Presta atención a la distribución.</p>
+                                <div class="chart-container h-[400px]">
+                                    <canvas id="skillsChart"></canvas>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-2">Dominar las funciones de `tidyverse` y las estructuras de R es casi el 70% del trabajo. Ahí está la clave del éxito en esta investigación.</p>
+                            </div>
+                            <img src="imagenes/sofia.jpg" onerror="this.onerror=null;this.src='https://placehold.co/384x384/EBE6E0/071E2D?text=Sofia';" alt="" class="rounded-lg shadow-md h-96 mx-auto">
                         </div>
-                        <div class="text-4xl self-center mx-4 text-[#118AB2]">→</div>
-                        <div class="flex-1 p-6 bg-white rounded-lg shadow-md border-l-4 border-[#FFD166]">
-                            <div class="text-4xl mb-2">2️⃣</div>
-                            <h3 class="font-bold text-lg">Exploración</h3>
-                            <p class="text-sm text-gray-600">Reconocer el terreno. Familiarizarse con RStudio y los datos.</p>
-                        </div>
-                           <div class="text-4xl self-center mx-4 text-[#118AB2]">→</div>
-                        <div class="flex-1 p-6 bg-white rounded-lg shadow-md border-l-4 border-[#06D6A0]">
-                            <div class="text-4xl mb-2">3️⃣</div>
-                            <h3 class="font-bold text-lg">Aplicación</h3>
-                            <p class="text-sm text-gray-600">Resolver el caso. Usar `tidyverse` para analizar y visualizar.</p>
-                        </div>
+                </div>
+
+                <!-- Slide 5: Caso Resuelto -->
+                <div class="slide">
+                    <div class="text-center p-8 mb-12">
+                        <h1 class="text-4xl md:text-6xl font-black text-[#071E2D] mb-4">Caso Resuelto (por ahora)</h1>
+                        <p class="text-xl text-[#10BED2] max-w-3xl mx-auto">¡Felicidades, detective! Has completado la introducción. Has visto las herramientas, la escena del crimen y el método de investigación.</p>
+                            <div class="flex flex-col md:flex-row justify-center items-center gap-8 mt-8">
+                                <img src="imagenes/sofia.jpg" onerror="this.onerror=null;this.src='https://placehold.co/256x256/EBE6E0/071E2D?text=Sofia';" alt="" class="rounded-lg shadow-lg h-64">
+                                <img src="imagenes/mateo.jpg" onerror="this.onerror=null;this.src='https://placehold.co/256x256/EBE6E0/071E2D?text=Mateo';" alt="" class="rounded-lg shadow-lg h-64">
+                            </div>
+                        <p class="mt-6 text-lg">Este es solo el comienzo de tu carrera como detective de datos. El mundo de los datos en salud pública está lleno de misterios por resolver. ¡Sigue investigando!</p>
+                    </div>
+                </div>
+
+                <!-- Slide: Objetivos de aprendizaje -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8 mb-12">
+                        <h2 class="text-3xl font-bold mb-6 text-[#071E2D]">Objetivos de aprendizaje</h2>
+                        <ul class="list-disc list-inside text-left max-w-2xl mx-auto space-y-2 text-lg text-[#071E2D]">
+                            <li>Identificar y utilizar R y RStudio en el análisis de datos.</li>
+                            <li>Familiarizarse con los distintos tipos de datos y operaciones fundamentales en R.</li>
+                            <li>Comprender las estructuras esenciales de datos en R, como los vectores y tablas.</li>
+                            <li>Entender el procedimiento para desarrollar funciones en R.</li>
+                            <li>Reconocer cómo importar, exportar y transformar bases de datos utilizando Tidyverse.</li>
+                        </ul>
+                        <p class="mt-6 text-lg text-[#10BED2]">¡Prepárate para dominar el análisis de datos en salud pública, detective!</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Slide 4: Pista #4 - Las Habilidades -->
-            <div class="slide">
-                    <div class="detective-card grid md:grid-cols-2 gap-8 items-center">
-                        <div class="text-center md:text-left">
-                            <h2 class="text-3xl font-bold mb-2">Pista #4: El Perfil del Experto</h2>
-                            <p class="mb-4">Soy Sofía. Para ser un gran detective de datos, necesitas un conjunto de habilidades equilibrado. Este informe revela las competencias clave que desarrollarás. Presta atención a la distribución.</p>
-                            <div class="chart-container h-[400px]">
-                                <canvas id="skillsChart"></canvas>
-                            </div>
-                            <p class="text-sm text-gray-500 mt-2">Dominar las funciones de `tidyverse` y las estructuras de R es casi el 70% del trabajo. Ahí está la clave del éxito.</p>
-                        </div>
-                        <!-- Imagen de Sofía con ruta local -->
-                        <img src="imagenes/sofia.png" alt="Detective Sofía analizando un donut chart" class="rounded-lg shadow-md h-96 mx-auto">
-                    </div>
-            </div>
+            <nav class="flex justify-between items-center w-full max-w-xl mx-auto mt-8">
+                <button id="prevBtnBienvenida" class="nav-button">Anterior</button>
+                <div id="slide-counter-bienvenida" class="text-sm font-bold"></div>
+                <button id="nextBtnBienvenida" class="nav-button">Siguiente</button>
+            </nav>
+        </section>
 
-            <!-- Slide 5: Caso Resuelto -->
-            <div class="slide">
-                <div class="text-center p-8">
-                    <h1 class="text-4xl md:text-6xl font-black text-[#073B4C] mb-4">Caso Resuelto (por ahora)</h1>
-                    <p class="text-xl text-[#118AB2] max-w-3xl mx-auto">¡Felicidades, detective! Has completado la introducción. Has visto las herramientas, el escenario y el método.</p>
-                     <div class="flex flex-col md:flex-row justify-center items-center gap-8 mt-8">
-                        <!-- Imagen de Sofía con ruta local -->
-                        <img src="imagenes/sofia.png" alt="Ilustración de la detective Sofía sonriendo" class="rounded-lg shadow-lg h-64">
-                        <!-- Imagen de Mateo con ruta local -->
-                        <img src="imagenes/mateo.png" alt="Ilustración del detective Mateo dando un pulgar arriba" class="rounded-lg shadow-lg h-64">
+        <!-- Sección Tema 1: Introducción (con slides internas) -->
+        <section id="tema1" class="section-padding">
+            <h2 class="text-4xl font-bold mb-4 text-[#071E2D]">Tema 1: Introducción</h2>
+            <div id="tema1-slides-container" class="relative min-h-[70vh] mb-8 slide-container">
+                <!-- Slide 1.1: ¿Por qué aprender R y RStudio? -->
+                <div class="slide active">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-4 text-[#10BED2]">¿Por qué aprender R y RStudio, detective?</h3>
+                        <p class="text-lg text-gray-700 mb-4">En los últimos años, R se ha convertido en una de las herramientas más utilizadas en el ámbito académico y profesional. Su versatilidad permite realizar análisis estadísticos complejos, crear modelos predictivos y generar visualizaciones avanzadas de datos.</p>
+                        <img src="imagenes/rstudio.png" onerror="this.onerror=null;this.src='https://placehold.co/400x250/F04A4C/FFFFFF?text=R+Power';" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-lg text-gray-700 mt-4">Además, es un software de código abierto, lo que significa que puedes utilizarlo sin costo y beneficiarte de una comunidad activa que constantemente mejora sus funciones. Una pista vital para tu investigación.</p>
                     </div>
-                    <p class="mt-6 text-lg">Este es solo el comienzo de tu carrera. El mundo de los datos en salud pública está lleno de misterios por resolver. ¡Sigue investigando!</p>
+                </div>
+
+                <!-- Slide 1.2: RStudio facilita la programación -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-4 text-[#10BED2]">RStudio: Tu Cuartel General de Investigación</h3>
+                        <p class="text-lg text-gray-700 mb-4">Por su parte, **RStudio** facilita la programación en R, proporcionando un entorno estructurado donde puedes escribir código, visualizar datos y gestionar paquetes de manera intuitiva.</p>
+                        <img src="imagenes/ambiente.png" onerror="this.onerror=null;this.src='https://placehold.co/400x250/DEFF00/071E2D?text=RStudio+IDE';" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-lg text-gray-700 mt-4">La combinación de R y RStudio es esencial en disciplinas como epidemiología, investigación en salud pública y ciencia de datos. Tu base de operaciones, detective.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 1.3: ¿Qué aprenderás en este curso? - Parte 1 -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-4 text-[#10BED2]">¿Qué descubrirás en este curso, detective?</h3>
+                        <p class="text-lg text-gray-700 mb-4">A lo largo de estas unidades, adquirirás habilidades clave para manejar datos de manera eficiente en R y RStudio, revelando cada huella:</p>
+                        <ul class="list-disc list-inside text-left max-w-2xl mx-auto space-y-2 text-lg text-[#071E2D]">
+                            <li>✅ Instalación y configuración de R y RStudio en tu equipo.</li>
+                            <li>✅ Uso de estructuras de datos fundamentales, como vectores, listas y data.frames.</li>
+                            <li>✅ Aplicación de operaciones básicas y funciones personalizadas para analizar información.</li>
+                        </ul>
+                        <img src="imagenes/rstudio.png" onerror="this.onerror=null;this.src='https://placehold.co/400x250/AEC800/071E2D?text=Habilidades+Clave+1';" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                    </div>
+                </div>
+
+                <!-- Slide 1.4: ¿Qué aprenderás en este curso? - Parte 2 -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-4 text-[#10BED2]">Avances en la Investigación: Habilidades Avanzadas</h3>
+                        <p class="text-lg text-gray-700 mb-4">Continuando con los descubrimientos que dominarás, detective:</p>
+                        <ul class="list-disc list-inside text-left max-w-2xl mx-auto space-y-2 text-lg text-[#071E2D]">
+                            <li>✅ Manipulación, limpieza y transformación de bases de datos con el paquete **Tidyverse**.</li>
+                            <li>✅ Creación de gráficos y visualizaciones con **ggplot2** para interpretar tendencias y patrones.</li>
+                            <li>✅ Automatización de tareas repetitivas, facilitando el procesamiento de datos.</li>
+                        </ul>
+                        <img src="imagenes/ambiente.png" onerror="this.onerror=null;this.src='https://placehold.co/400x250/106BA0/FFFFFF?text=Habilidades+Clave+2';" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                    </div>
+                </div>
+
+                <!-- Slide 1.5: Aplicaciones prácticas y Conclusión -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-4 text-[#10BED2]">Aplicaciones Prácticas: ¡El Campo te Espera!</h3>
+                        <p class="text-lg text-gray-700 mb-4">Este curso está diseñado para brindarte habilidades aplicables en investigación epidemiológica, salud pública y análisis de datos biomédicos.</p>
+                        <p class="text-lg text-gray-700 mb-6">Al finalizar, estarás capacitado para trabajar con datos reales, mejorar la presentación de resultados y realizar análisis estadísticos sólidos para la toma de decisiones, ¡como un verdadero detective de datos!</p>
+                        <img src="imagenes/listo.png" onerror="this.onerror=null;this.src='https://placehold.co/400x250/071E2D/FFFFFF?text=Aplicaciones+Reales';" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-xl font-bold mt-6 text-[#AEC800]">🚀 Prepárate para sumergirte en el mundo de R y RStudio y descubrir su potencial en el análisis de datos en salud. ¡Comenzamos nuestra investigación, detective!</p>
+                    </div>
                 </div>
             </div>
-        </main>
 
-        <nav class="flex justify-between items-center w-full max-w-xl mx-auto">
-            <button id="prevBtn" class="nav-button">Anterior</button>
-            <div id="slide-counter" class="text-sm font-bold"></div>
-            <button id="nextBtn" class="nav-button">Siguiente</button>
-        </nav>
-    </div>
+            <nav class="flex justify-between items-center w-full max-w-xl mx-auto mt-8">
+                <button id="prevBtnTema1" class="nav-button">Anterior</button>
+                <div id="slide-counter-tema1" class="text-sm font-bold"></div>
+                <button id="nextBtnTema1" class="nav-button">Siguiente</button>
+            </nav>
+        </section>
+
+        <!-- Sección Tema 2: Instalación de R y RStudio (con slides internas) -->
+        <section id="tema2" class="section-padding">
+            <h2 class="text-4xl font-bold mb-4 text-[#071E2D]">📌 Tema 2: Instalación de R y RStudio</h2>
+            <p class="text-lg text-gray-700 mb-6">Para comenzar a trabajar con R y RStudio, sigue estos pasos detallados para su instalación en tu computadora, detective.</p>
+
+            <div id="tema2-slides-container" class="relative min-h-[70vh] mb-8 slide-container">
+                <!-- Slide 1: Introducción a la instalación de R -->
+                <div class="slide active">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">1️⃣ Instalación de R: La Primera Evidencia</h3>
+                        <p class="text-lg text-gray-700 mb-4">La instalación de R es el primer paso para adentrarte en el análisis de datos. Asegúrate de seguir las instrucciones específicas para tu sistema operativo, detective.</p>
+                        <img src="imagenes/posit.png" onerror="this.onerror=null;this.src='https://placehold.co/300x200/F04A4C/FFFFFF?text=Descarga+R';" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500">Haz clic en "Siguiente" para ver los pasos detallados de esta primera pista.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 2: Paso 1: Descargar R -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">📍 Paso 1: Descargar R</h3>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>Abre tu navegador de confianza.</li>
+                            <li>Accede a la página oficial: 👉 <a href="https://www.r-project.org/" target="_blank" class="text-[#AEC800] hover:underline font-bold">www.r-project.org</a></li>
+                            <li>Ubica "Download R" y haz clic.</li>
+                            <li>Selecciona un **CRAN Mirror** (servidor de descarga) cercano a tu ubicación.</li>
+                        </ul>
+                        <img src="imagenes/posit.png" onerror="this.onerror=null;this.src='https://placehold.co/300x200/DEFF00/071E2D?text=Sitio+Web+R-Project';" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                    </div>
+                </div>
+
+                <!-- Slide 3: Paso 2: Elegir el sistema operativo -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">📍 Paso 2: Elegir el sistema operativo</h3>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>🔹 Para **Windows**: Haz clic en “Download R for Windows” y luego en “base”.</li>
+                            <li>🔹 Para **macOS**: Selecciona “Download R for macOS”.</li>
+                            <li>🔹 Para **Linux**: Revisa las opciones específicas para tu distribución.</li>
+                            <li>💡 **Recomendación:** Descarga siempre la versión más reciente.</li>
+                        </ul>
+                        <img src="https://placehold.co/300x200/AEC800/071E2D?text=Seleccionar+SO" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                    </div>
+                </div>
+
+                <!-- Slide 4: Paso 3: Instalar R -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">📍 Paso 3: Instalar R</h3>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>Ejecuta el archivo descargado.</li>
+                            <li>Sigue los pasos del instalador:
+                                <ul class="list-circle list-inside ml-4">
+                                    <li>Acepta los términos de licencia.</li>
+                                    <li>Elige la carpeta de instalación (predeterminada es buena).</li>
+                                    <li>Mantén las opciones recomendadas.</li>
+                                    <li>Haz clic en “Instalar”.</li>
+                                </ul>
+                            </li>
+                            <li>Verifica que la instalación finalice correctamente.</li>
+                        </ul>
+                        <img src="https://placehold.co/300x200/106BA0/FFFFFF?text=Instalador+R" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                    </div>
+                </div>
+
+                <!-- Slide 5: Instalación de RStudio - Paso 1: Descargar RStudio -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">2️⃣ Instalación de RStudio: Descarga de la Herramienta Principal</h3>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>Dirígete a: 👉 <a href="https://posit.co/download/rstudio-desktop/" target="_blank" class="text-[#AEC800] hover:underline font-bold">posit.co/download/rstudio-desktop/</a></li>
+                            <li>Busca y haz clic en "Install RStudio".</li>
+                            <li>Selecciona tu sistema operativo.</li>
+                            <li>💡 **Importante, detective:** R debe estar instalado primero.</li>
+                        </ul>
+                        <img src="imagenes/rstudio.png" onerror="this.onerror=null;this.src='https://placehold.co/300x200/071E2D/FFFFFF?text=Sitio+Web+Posit';" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                    </div>
+                </div>
+
+                <!-- Slide 6: Instalación de RStudio - Paso 2: Instalar RStudio -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">📍 Paso 2: Instalar RStudio</h3>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>Ejecuta el archivo de instalación de RStudio.</li>
+                            <li>Acepta los términos y elige la ubicación (puedes dejar la recomendada).</li>
+                            <li>Se recomienda crear un acceso directo en el escritorio.</li>
+                            <li>Haz clic en “Instalar” y espera a que finalice.</li>
+                        </ul>
+                        <img src="https://placehold.co/300x200/F04A4C/FFFFFF?text=Instalador+RStudio" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                    </div>
+                </div>
+
+                <!-- Slide 7: Verificación de la instalación -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">3️⃣ Verificación de la instalación: Confirmando las Pistas</h3>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>Abre RStudio desde el escritorio.</li>
+                            <li>En la consola, escribe: <pre class="bg-gray-100 p-2 rounded-md inline-block text-sm text-[#071E2D]"><code>2 + 2</code></pre> y presiona Enter.</li>
+                            <li>Si el resultado es **4**, ¡todo está listo, detective! 🎉</li>
+                            <li>💡 **Consejo:** Si hay errores, verifica la instalación de R o reinstala RStudio para asegurar que no haya huellas falsas.</li>
+                        </ul>
+                        <img src="imagenes/consola.png" onerror="this.onerror=null;this.src='https://placehold.co/300x200/DEFF00/071E2D?text=Consola+RStudio';" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                    </div>
+                </div>
+
+                <!-- Slide 8: Instalar paquetes esenciales -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">📦 Instalar paquetes esenciales: Tus Herramientas Especializadas</h3>
+                        <p class="text-lg text-gray-700 mb-2">Instala `tidyverse` en la consola de RStudio, detective:</p>
+                        <pre class="bg-gray-100 p-2 rounded-md my-2 text-sm text-[#071E2D]"><code>install.packages("tidyverse")</code></pre>
+                        <p class="text-lg text-gray-700 mb-2">Luego, actívalos para tu sesión:</p>
+                        <pre class="bg-gray-100 p-2 rounded-md my-2 text-sm text-[#071E2D]"><code>library(tidyverse)
+library(readxl)
+library(dplyr)</code></pre>
+                        <img src="imagenes/rstudio.png" onerror="this.onerror=null;this.src='https://placehold.co/300x200/AEC800/071E2D?text=Instalar+Paquetes';" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                    </div>
+                </div>
+
+                <!-- Slide 9: Finalización -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">¡Todo Listo para la Investigación!</h3>
+                        <p class="text-xl font-bold mt-6 text-[#AEC800]">🚀 ¡Ya tienes R y RStudio configurados y listos para el análisis de datos en salud pública, detective!</p>
+                        <img src="imagenes/listo.png" onerror="this.onerror=null;this.src='https://placehold.co/250x250/106BA0/FFFFFF?text=Listo+para+trabajar';" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500">Ahora puedes proceder al siguiente tema y seguir las huellas de los datos.</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="flex justify-between items-center w-full max-w-xl mx-auto mt-8">
+                <button id="prevBtnTema2" class="nav-button">Anterior</button>
+                <div id="slide-counter-tema2" class="text-sm font-bold"></div>
+                <button id="nextBtnTema2" class="nav-button">Siguiente</button>
+            </nav>
+        </section>
+
+        <!-- Sección Tema 3: Ambiente de RStudio (con slides internas) -->
+        <section id="tema3" class="section-padding">
+            <h2 class="text-4xl font-bold mb-4 text-[#071E2D]">Tema 3: Ambiente de RStudio: Tu Cuartel de Análisis</h2>
+            <p class="text-lg text-gray-700 mb-6">RStudio se organiza en cuatro secciones principales, detective, cada una diseñada para facilitar distintos aspectos del flujo de trabajo en programación y análisis de datos. Es como tu oficina de investigación.</p>
+
+            <div id="tema3-slides-container" class="relative min-h-[70vh] mb-8 slide-container">
+                <!-- Slide 1: Visión general de las 4 secciones -->
+                <div class="slide active">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-4 text-[#10BED2]">Las Cuatro Secciones Principales de RStudio</h3>
+                        <p class="text-lg text-gray-700 mb-6">A continuación, describimos cada sección en detalle, como los distintos departamentos de tu agencia de detectives:</p>
+                        <img src="imagenes/ambiente.png" onerror="this.onerror=null;this.src='https://placehold.co/600x400/071E2D/FFFFFF?text=RStudio+Layout+Overview';" alt="" class="mx-auto my-4 rounded-lg shadow-md w-full max-w-xl">
+                        <p class="text-sm text-gray-500 mt-2">Observa la distribución de los paneles: Editor, Entorno, Consola y Visualizador.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 2: Editor (sección superior izquierda) -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">El Editor: Tu Cuaderno de Notas</h3>
+                        <p class="text-lg text-gray-700 font-medium mb-2">Función principal: Este es el espacio destinado a escribir y editar código mediante la creación de scripts. Aquí apuntas todas tus hipótesis y pasos de investigación, detective.</p>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>Permite redactar de forma ordenada y documentada para asegurar la reproducibilidad.</li>
+                            <li>Puedes guardar tus scripts para reutilizarlos o compartirlos como informes.</li>
+                            <li>La ejecución del código se hace con **Control+Enter** (Windows) o **Command+Enter** (Mac).</li>
+                        </ul>
+                        <img src="imagenes/editor.png" onerror="this.onerror=null;this.src='https://placehold.co/600x300/F04A4C/FFFFFF?text=RStudio+Editor';" alt="" class="mx-auto my-4 rounded-lg shadow-md w-full max-w-xl">
+                        <p class="text-sm text-gray-500 mt-2">Recomendación: Mantén tus scripts bien organizados y comenta tu código. ¡Las buenas notas son clave para resolver el caso!</p>
+                    </div>
+                </div>
+
+                <!-- Slide 3: Entorno (sección superior derecha) -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">El Entorno: Tu Sala de Pruebas</h3>
+                        <p class="text-lg text-gray-700 font-medium mb-2">Función principal: Aquí se visualizan todos los objetos creados o cargados durante la sesión en R. Piensa en ella como la mesa donde organizas y revisas todas las pruebas que has recolectado, detective.</p>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>Muestra el estado actual de tu sesión de trabajo (variables, data.frames, etc.).</li>
+                            <li>Es útil para verificar que los datos se han importado correctamente.</li>
+                        </ul>
+                        <img src="imagenes/entorno.png" onerror="this.onerror=null;this.src='https://placehold.co/600x300/DEFF00/071E2D?text=RStudio+Environment';" alt="" class="mx-auto my-4 rounded-lg shadow-md w-full max-w-xl">
+                        <p class="text-sm text-gray-500 mt-2">Recomendación: Revisa esta sección frecuentemente para gestionar tu espacio de trabajo. ¡No querrás perder ninguna pista!</p>
+                    </div>
+                </div>
+
+                <!-- Slide 4: Consola (sección inferior izquierda) -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">La Consola: Tu Línea Directa con los Datos</h3>
+                        <p class="text-lg text-gray-700 font-medium mb-2">Función principal: Es el área donde se ejecuta el código de manera inmediata. Es como tu radio de comunicación directa para obtener respuestas rápidas de los datos, detective.</p>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>Puedes escribir comandos directamente y obtener resultados instantáneos.</li>
+                            <li>Ideal para realizar pruebas rápidas o ejecutar funciones puntuales.</li>
+                            <li>Los comandos en la consola no se guardan al cerrar la sesión.</li>
+                        </ul>
+                        <img src="imagenes/consola.png" onerror="this.onerror=null;this.src='https://placehold.co/600x300/AEC800/071E2D?text=RStudio+Console';" alt="" class="mx-auto my-4 rounded-lg shadow-md w-full max-w-xl">
+                        <p class="text-sm text-gray-500 mt-2">Recomendación: Para análisis complejos o reproducibles, usa el editor. La consola es para interrogatorios rápidos.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 5: Visualizador (sección inferior derecha) -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">El Visualizador: Tu Tablero de Evidencias</h3>
+                        <p class="text-lg text-gray-700 font-medium mb-2">Función principal: Es un panel multifuncional destinado a mostrar resultados y gestionar recursos. Aquí es donde despliegas tus gráficos y revisas tus archivos del caso, detective.</p>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>**Files:** Explora los archivos de tu directorio de trabajo, tus expedientes.</li>
+                            <li>**Plots:** Muestra los gráficos generados, tus mapas de patrones.</li>
+                            <li>**Packages:** Lista los paquetes instalados, tus herramientas adicionales.</li>
+                            <li>**Help:** Accede a la documentación de R, tu manual del buen detective.</li>
+                            <li>**Viewer:** Visualiza páginas web o informes interactivos, tus informes finales.</li>
+                        </ul>
+                        <img src="imagenes/visualizador.png" onerror="this.onerror=null;this.src='https://placehold.co/600x300/106BA0/FFFFFF?text=RStudio+Viewer';" alt="" class="mx-auto my-4 rounded-lg shadow-md w-full max-w-xl">
+                        <p class="text-sm text-gray-500 mt-2">Recomendación: Utiliza esta sección para revisar tus gráficos y acceder rápidamente a la documentación. ¡Cada pista cuenta!</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="flex justify-between items-center w-full max-w-xl mx-auto mt-8">
+                <button id="prevBtnTema3" class="nav-button">Anterior</button>
+                <div id="slide-counter-tema3" class="text-sm font-bold"></div>
+                <button id="nextBtnTema3" class="nav-button">Siguiente</button>
+            </nav>
+        </section>
+
+        <!-- Sección Tema 4: Configuración de un proyecto en RStudio (con slides internas) -->
+        <section id="tema4" class="section-padding">
+            <h2 class="text-4xl font-bold mb-4 text-[#071E2D]">Tema 4: Configuración de un Proyecto: Organizando la Escena del Crimen</h2>
+            <p class="text-lg text-gray-700 mb-6">Un buen detective organiza sus pruebas. En RStudio, esto significa configurar un proyecto. ¡Prepárate para la organización, detective!</p>
+
+            <div id="tema4-slides-container" class="relative min-h-[70vh] mb-8 slide-container">
+                <!-- Slide 1: Introducción a la creación de proyectos -->
+                <div class="slide active">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-4 text-[#10BED2]">📌 Pasos para crear un Proyecto en RStudio</h3>
+                        <p class="text-lg text-gray-700 mb-6">Crear un proyecto es esencial para mantener tu trabajo organizado, facilitar la colaboración y asegurar la reproducibilidad de tus análisis. Es como preparar tu kit de investigación para un nuevo caso. ¡Vamos a ver cómo se hace!</p>
+                        <img src="imagenes/directorio.png" onerror="this.onerror=null;this.src='https://placehold.co/400x250/F04A4C/FFFFFF?text=Organizar+Proyecto';" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Sigue estos pasos para establecer un entorno de trabajo eficiente.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 2: Paso 1: Abrir RStudio y crear un nuevo proyecto -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">1️⃣ Abrir RStudio y crear un nuevo Proyecto</h3>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>En la barra superior de RStudio, selecciona **File (Archivo) → New Project... (Nuevo Proyecto)**.</li>
+                            <li>Se abrirá la ventana **New Project Wizard: Create Project** con diferentes opciones.</li>
+                        </ul>
+                        <img src="imagenes/directorio.png" onerror="this.onerror=null;this.src='https://placehold.co/400x250/DEFF00/071E2D?text=New+Project+Menu';" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Este es el punto de partida para tu nuevo caso de datos, detective.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 3: Paso 2: Seleccionar la opción de nuevo directorio -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">2️⃣ Seleccionar la opción de Nuevo Directorio</h3>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>En la pantalla del asistente, elige **New Directory (Directorio Nuevo)**.</li>
+                            <li>Esta opción te permite crear una estructura de carpetas limpia y dedicada para tu proyecto desde cero. Es tu nuevo expediente en blanco.</li>
+                        </ul>
+                        <img src="imagenes/tipo_projecto.png" onerror="this.onerror=null;this.src='https://placehold.co/400x250/AEC800/071E2D?text=New+Directory';" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Crear un directorio nuevo ayuda a mantener todas las huellas en su lugar.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 4: Paso 3: Definir el nombre y ubicación del proyecto -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">3️⃣ Definir el Nombre y Ubicación del Proyecto</h3>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>En la ventana **Project Type**, selecciona **New Project → Create New Project**.</li>
+                            <li>En la casilla **Directory Name (Nombre del Directorio)**, introduce el nombre del proyecto (por ejemplo, "Caso_Epidemiologico").</li>
+                            <li>Haz clic en **Browse...** para elegir dónde quieres guardar tu proyecto, el lugar seguro para tus evidencias.</li>
+                        </ul>
+                        <img src="imagenes/nombre.png" onerror="this.onerror=null;this.src='https://placehold.co/400x250/106BA0/FFFFFF?text=Project+Name+Location';" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Se recomienda una ubicación clara y accesible para tu expediente, detective.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 5: Crear la estructura de carpetas y recomendación -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">4️⃣ Crear la Estructura de Carpetas dentro del Proyecto</h3>
+                        <p class="text-lg text-gray-700 mb-2">Para mantener el trabajo organizado, como un buen archivo de casos, se sugiere crear subcarpetas como:</p>
+                        <ul class="list-disc list-inside text-left max-w-2xl mx-auto space-y-1 text-gray-700">
+                            <li>**datos** → Para almacenar bases de datos, archivos CSV, Excel, etc. (tus evidencias en bruto).</li>
+                            <li>**scripts** → Para guardar los códigos en R que generan los análisis (tus notas de investigación).</li>
+                            <li>**figuras** → Para almacenar gráficos y visualizaciones creadas en RStudio (tus representaciones visuales de las pistas).</li>
+                        </ul>
+                        <img src="imagenes/vista_proyecto.png" onerror="this.onerror=null;this.src='https://placehold.co/400x250/071E2D/FFFFFF?text=Folder+Structure';" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">📌 **Recomendación, detective:** Mantener una estructura clara mejora la reproducibilidad de tus investigaciones. ¡Tu proyecto está listo para comenzar a trabajar!</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="flex justify-between items-center w-full max-w-xl mx-auto mt-8">
+                <button id="prevBtnTema4" class="nav-button">Anterior</button>
+                <div id="slide-counter-tema4" class="text-sm font-bold"></div>
+                <button id="nextBtnTema4" class="nav-button">Siguiente</button>
+            </nav>
+        </section>
+
+        <!-- Sección Tema 5: Tipos de datos y operadores en R (con slides internas) -->
+        <section id="tema5" class="section-padding">
+            <h2 class="text-4xl font-bold mb-4 text-[#071E2D]">Tema 5: Tipos de Datos y Operadores: El Lenguaje Secreto de los Datos</h2>
+            <p class="text-lg text-gray-700 mb-6">R es un lenguaje de programación que permite manejar diversos tipos de datos y aplicar operadores matemáticos y lógicos para procesarlos eficientemente. Comprender estos elementos es fundamental para estructurar y analizar información de manera correcta, detective.</p>
+
+            <div id="tema5-slides-container" class="relative min-h-[70vh] mb-8 slide-container">
+                <!-- Slide 1: Introducción y Tipos de datos en R -->
+                <div class="slide active">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-4 text-[#10BED2]">📌 Tipos de Datos en R: Clasificando la Evidencia</h3>
+                        <p class="text-lg text-gray-700 mb-6">R tiene distintos formatos de datos según la información que se maneja. Conocerlos es clave para manipular y analizar correctamente la evidencia, detective.</p>
+                        <img src="https://placehold.co/400x250/F04A4C/FFFFFF?text=Data+Types+Intro" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Vamos a explorar los más utilizados en tu labor de detective.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 2: Números decimales (double) y Números enteros (integer) -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">Tipos de Datos: Números</h3>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>**Números decimales (double)**: Representan valores con punto decimal, como `3.3`, `10.5`, `-2.1`. Piensa en ellos como mediciones exactas.</li>
+                            <li>**Números enteros (integer)**: Son valores sin decimales, como `3`, `10`, `-5`. Como el número de casos.</li>
+                        </ul>
+                        <pre class="bg-gray-100 p-2 rounded-md my-4 text-sm text-[#071E2D] text-left"><code># Ejemplo de double
+x <- 3.3
+class(x) # Output: "numeric" (R representa 'double' como 'numeric')
+
+# Ejemplo de integer
+y <- 3L # La 'L' indica que es un entero
+class(y) # Output: "integer"</code></pre>
+                        <img src="https://placehold.co/400x250/DEFF00/071E2D?text=Numeric+Data" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">El tipo `numeric` es el más común para números, `integer` se usa explícitamente.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 3: Cadenas de texto (character) y Valores lógicos (logical) -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">Tipos de Datos: Texto y Lógicos</h3>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>**Cadenas de texto (character)**: Se usan para almacenar palabras o frases, por ejemplo, `"Municipio"`, `"Sexo"`, `"Nombre"`. Son como las descripciones de las huellas.</li>
+                            <li>**Valores lógicos o booleanos (logical)**: Indican verdadero o falso, como `TRUE` o `FALSE`. Útiles para determinar si una pista es real o falsa.</li>
+                        </ul>
+                        <pre class="bg-gray-100 p-2 rounded-md my-4 text-sm text-[#071E2D] text-left"><code># Ejemplo de character
+ciudad <- "Bogota"
+class(ciudad) # Output: "character"
+
+# Ejemplo de logical
+es_activo <- TRUE
+class(es_activo) # Output: "logical"</code></pre>
+                        <img src="https://placehold.co/400x250/AEC800/071E2D?text=Text+Logical+Data" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Los lógicos son esenciales para filtros y condiciones en tus investigaciones, detective.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 4: Fechas (date) y Valores especiales (NA, NAN, Inf) -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">Tipos de Datos: Fechas y Casos Especiales</h3>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>**Fechas (date)**: Representan días específicos, por ejemplo, `"01/01/2022"`. Cruciales para la cronología de los eventos en tu caso.</li>
+                            <li>**Valores especiales**:
+                                <ul class="list-circle list-inside ml-4">
+                                    <li>`NA`: Indica **datos faltantes** (missing). Una pista que no se encontró.</li>
+                                    <li>`NaN`: Significa "**not a number**", aparece en operaciones erróneas como `0/0`. Un cálculo que no tiene sentido.</li>
+                                    <li>`Inf`: Se usa cuando el resultado es **infinito**, como `1/0`. Algo que es inmedible.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <pre class="bg-gray-100 p-2 rounded-md my-4 text-sm text-[#071E2D] text-left"><code># Ejemplo de date
+fecha_analisis <- as.Date("2023-10-26")
+class(fecha_analisis) # Output: "Date"
+
+# Ejemplos de valores especiales
+val_faltante <- NA
+resultado_error <- 0/0
+resultado_infinito <- 1/0</code></pre>
+                        <img src="https://placehold.co/400x250/106BA0/FFFFFF?text=Special+Data+Types" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">💡 **Consejo, detective:** Es importante identificar el tipo de dato, ya que afectará las funciones de R. ¡Como saber si una huella es de zapato o de bota!</p>
+                    </div>
+                </div>
+
+                <!-- Slide 5: Operadores matemáticos: aritméticos -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">📌 Operadores Aritméticos: Tus Herramientas de Cálculo</h3>
+                        <p class="text-lg text-gray-700 font-medium mb-2">Los operadores aritméticos realizan cálculos numéricos básicos, esenciales para cuantificar tus hallazgos:</p>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>**+**: Suma (`5 + 3` = `8`)</li>
+                            <li>**-**: Resta (`10 - 4` = `6`)</li>
+                            <li>**\***: Multiplicación (`2 * 6` = `12`)</li>
+                            <li>**/**: División (`15 / 3` = `5`)</li>
+                            <li>**^**: Potencia (`2 ^ 3` = `8`)</li>
+                        </ul>
+                        <pre class="bg-gray-100 p-2 rounded-md my-4 text-sm text-[#071E2D] text-left"><code># Ejemplos de operadores aritméticos
+suma <- 5 + 3
+resta <- 10 - 4
+multiplicacion <- 2 * 6
+division <- 15 / 3
+potencia <- 2 ^ 3</code></pre>
+                        <img src="https://placehold.co/400x250/071E2D/FFFFFF?text=Arithmetic+Operators" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Fundamentales para cualquier cálculo en tu investigación, detective.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 6: Operadores de comparación -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">Operadores de Comparación: Identificando Coincidencias</h3>
+                        <p class="text-lg text-gray-700 font-medium mb-2">Estos operadores comparan dos valores y devuelven un resultado lógico (`TRUE` o `FALSE`). Te ayudan a ver si una pista coincide con lo que buscas:</p>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>**<**, **>**: Menor o mayor que (`5 < 10` es `TRUE`)</li>
+                            <li>**==**: Igualdad (`"Hola" == "Hola"` es `TRUE`)</li>
+                            <li>**>=**, **<=**: Mayor o menor igual (`7 >= 7` es `TRUE`)</li>
+                            <li>**!=**: Diferente (`"R" != "Python"` es `TRUE`)</li>
+                        </ul>
+                        <pre class="bg-gray-100 p-2 rounded-md my-4 text-sm text-[#071E2D] text-left"><code># Ejemplos de operadores de comparación
+es_menor <- 5 < 10
+es_igual <- "R" == "r"
+es_mayor_igual <- 7 >= 7
+es_diferente <- 10 != 5</code></pre>
+                        <img src="https://placehold.co/400x250/F04A4C/FFFFFF?text=Comparison+Operators" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Esenciales para filtrar datos y establecer condiciones en tus búsquedas, detective.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 7: Operadores booleanos -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">Operadores Booleanos: Lógica en tu Investigación</h3>
+                        <p class="text-lg text-gray-700 font-medium mb-2">Permiten combinar y manipular valores lógicos. Son tu forma de construir argumentos complejos para tu caso:</p>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>**&** (AND): Ambos valores deben ser verdaderos para que el resultado sea `TRUE`. Si la huella *y* la coartada son falsas.</li>
+                            <li>**|** (OR): Si al menos un valor es `TRUE`, el resultado es `TRUE`. Si el sospechoso estaba *aquí* o *allá*.</li>
+                            <li>**!** (NOT): Invierte el valor lógico (`!TRUE` es `FALSE`). Lo opuesto a lo que esperas.</li>
+                        </ul>
+                        <pre class="bg-gray-100 p-2 rounded-md my-4 text-sm text-[#071E2D] text-left"><code># Ejemplos de operadores booleanos
+condicion_and <- (TRUE & FALSE)
+condicion_or <- (TRUE | FALSE)
+condicion_not <- !TRUE</code></pre>
+                        <img src="https://placehold.co/400x250/DEFF00/071E2D?text=Boolean+Operators" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Permiten construir condiciones complejas para tus análisis, detective.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 8: Operadores de asignación: <- -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">📌 Operadores de Asignación: La Flecha `<-`</h3>
+                        <p class="text-lg text-gray-700 font-medium mb-2">El operador `<-` es el estándar en R para asignar valores a variables. Es como etiquetar tus pruebas para no perderlas de vista, detective:</p>
+                        <pre class="bg-gray-100 p-2 rounded-md my-4 text-sm text-[#071E2D] text-left"><code>nombre_persona <- "Laura"
+edad_paciente <- 30
+suma_valores <- 10 + 5</code></pre>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>Este operador permite que la variable sea accesible tanto dentro como fuera de funciones.</li>
+                            <li>Es la forma preferida para la asignación general en R.</li>
+                        </ul>
+                        <img src="https://placehold.co/400x250/AEC800/071E2D?text=Assignment+Arrow" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Úsalo para nombrar tus datos y resultados en el expediente del caso, detective.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 9: Operadores de asignación: = y Consejo Final -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">Operadores de Asignación: El Signo `=` y un Consejo Final</h3>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>**=**: Se usa principalmente para asignar valores **dentro de funciones** (especialmente para argumentos).
+                                <pre class="bg-gray-100 p-2 rounded-md my-2 text-sm text-[#071E2D] text-left"><code># Ejemplo de uso de '=' dentro de una función
+plot(x = c(1,2,3), y = c(4,5,6), main = "Mi Gráfico")</code></pre>
+                            </li>
+                            <li>A diferencia de `<-`, la asignación con `=` solo tiene efecto dentro del contexto de la función y la variable mantiene su valor original fuera de ella.</li>
+                        </ul>
+                        <img src="https://placehold.co/400x250/106BA0/FFFFFF?text=Assignment+Equal" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">💡 **Consejo, detective:** Para buenas prácticas, usa `<-` en la mayoría de los casos, excepto cuando trabajes dentro de funciones donde `=` es más apropiado. ¡Cada herramienta tiene su lugar en el kit!</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="flex justify-between items-center w-full max-w-xl mx-auto mt-8">
+                <button id="prevBtnTema5" class="nav-button">Anterior</button>
+                <div id="slide-counter-tema5" class="text-sm font-bold"></div>
+                <button id="nextBtnTema5" class="nav-button">Siguiente</button>
+            </nav>
+        </section>
+
+        <!-- Sección Tema 6: Estructuras de datos en R (con slides internas) -->
+        <section id="tema6" class="section-padding">
+            <h2 class="text-4xl font-bold mb-4 text-[#071E2D]">Tema 6: Estructuras de Datos: El Archivo de Evidencias</h2>
+            <p class="text-lg text-gray-700 mb-6">Profundizaremos en las estructuras de datos más comunes y útiles en R, detective: vectores, matrices, arrays, listas y data frames (tablas). Comprenderemos sus características, cómo crearlas y cómo acceder a sus elementos, ¡como organizar tus expedientes!</p>
+
+            <div id="tema6-slides-container" class="relative min-h-[70vh] mb-8 slide-container">
+                <!-- Slide 1: Introducción a Vectores y Tablas de Datos en R -->
+                <div class="slide active">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-4 text-[#10BED2]">🧩 Tema: Vectores y Tablas de Datos en R</h3>
+                        <p class="text-lg text-gray-700 mb-6">En R, la forma en que organizas tus datos es fundamental para tu investigación, detective. Exploraremos dos de las estructuras más importantes: **vectores** y **data.frames** (tablas de datos).</p>
+                        <img src="https://placehold.co/400x250/F04A4C/FFFFFF?text=Data+Structures+Intro" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Comprenderlos te permitirá manejar eficientemente cualquier conjunto de datos. ¡Empecemos por la base!</p>
+                    </div>
+                </div>
+
+                <!-- Slide 2: ¿Qué es un vector en R? -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">🔹 ¿Qué es un Vector en R?</h3>
+                        <p class="text-lg text-gray-700 mb-4">Un **vector** es la estructura de datos más básica en R. Consiste en una secuencia ordenada de elementos del **mismo tipo** (todos numéricos, todos caracteres, todos lógicos, etc.). Piensa en ello como una lista de huellas del mismo tipo, detective.</p>
+                        <p class="text-lg text-gray-700 mb-6">Los vectores permiten almacenar datos simples y manipularlos de forma rápida mediante operaciones matemáticas o lógicas.</p>
+                        <img src="https://placehold.co/400x250/DEFF00/071E2D?text=Vector+Concept" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                    </div>
+                </div>
+
+                <!-- Slide 3: ¿Cómo se crea un vector? -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">📌 ¿Cómo se crea un Vector?</h3>
+                        <p class="text-lg text-gray-700 font-medium mb-2">Se usa la función `c()` (de “combine”), detective:</p>
+                        <pre class="bg-gray-100 p-2 rounded-md my-4 text-sm text-[#071E2D] text-left"><code># Vector de nombres de enfermedades
+enfermedades <- c("COVID-19", "Dengue", "Zika", "Influenza")
+
+# Vector de casos confirmados
+casos <- c(1200, 800, 350, 950)
+
+# Vector de estados de vacunación (TRUE = vacunación activa)
+vacunacion <- c(TRUE, FALSE, FALSE, TRUE)</code></pre>
+                        <p class="text-sm text-gray-500 mt-2">💡 Los nombres de variables no deben llevar tildes ni espacios, y los datos tipo texto van entre comillas. ¡Pequeñas reglas para un gran detective!</p>
+                        <img src="https://placehold.co/400x250/AEC800/071E2D?text=Create+Vector+Code" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                    </div>
+                </div>
+
+                <!-- Slide 4: ¿Qué es un data.frame (tabla de datos)? -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">🔹 ¿Qué es un Data.frame (Tabla de Datos)?</h3>
+                        <p class="text-lg text-gray-700 mb-4">Un **data.frame** es una estructura más compleja que agrupa varios vectores como columnas. Piensa en ello como el expediente completo de un caso, donde cada columna es un tipo de evidencia (edad, diagnóstico, etc.) y cada fila es un caso o paciente individual:</p>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>Cada columna es una variable (por ejemplo, edad, diagnóstico, vacunación).</li>
+                            <li>Cada fila representa una observación (por ejemplo, un paciente o caso individual).</li>
+                            <li>Todas las columnas deben tener el mismo número de filas.</li>
+                        </ul>
+                        <img src="https://placehold.co/400x250/106BA0/FFFFFF?text=DataFrame+Concept" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                    </div>
+                </div>
+
+                <!-- Slide 5: ¿Para qué sirve? y ¿Cómo se crea un data.frame? -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">📌 Utilidad y Creación de Data.frames</h3>
+                        <p class="text-lg text-gray-700 font-medium mb-2">**¿Para qué sirve, detective?**</p>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>Es la forma principal de trabajar con datos en R, especialmente útil para organizar bases de datos de vigilancia epidemiológica, brotes, encuestas de salud, etc. Es donde archivarás la mayoría de tus casos.</li>
+                        </ul>
+                        <p class="text-lg text-gray-700 font-medium mt-4 mb-2">**¿Cómo se crea un data.frame?**</p>
+                        <pre class="bg-gray-100 p-2 rounded-md my-4 text-sm text-[#071E2D] text-left"><code># Tabla con información de cuatro pacientes
+datos_pacientes <- data.frame(
+  enfermedad = enfermedades,
+  casos = casos,
+  vacunacion = vacunacion
+)</code></pre>
+                        <img src="https://placehold.co/400x250/071E2D/FFFFFF?text=Create+DataFrame+Code" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                    </div>
+                </div>
+
+                <!-- Slide 6: Funciones para explorar data.frames -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">🛠️ Funciones para explorar Data.frames: Tu Lupa del Archivo</h3>
+                        <p class="text-lg text-gray-700 font-medium mb-2">Estas funciones permiten conocer las características de un data.frame. Son como las herramientas de tu lupa para examinar los expedientes, detective:</p>
+                        <div class="overflow-x-auto mx-auto max-w-2xl">
+                            <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
+                                <thead>
+                                    <tr>
+                                        <th class="py-2 px-4 border-b text-left text-gray-800">Función</th>
+                                        <th class="py-2 px-4 border-b text-left text-gray-800">Descripción</th>
+                                        <th class="py-2 px-4 border-b text-left text-gray-800">Ejemplo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="py-2 px-4 border-b">`colnames()`</td>
+                                        <td class="py-2 px-4 border-b">Muestra los nombres de las columnas (los encabezados de tus reportes)</td>
+                                        <td class="py-2 px-4 border-b">`colnames(datos_pacientes)`</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 px-4 border-b">`rownames()`</td>
+                                        <td class="py-2 px-4 border-b">Devuelve los nombres o identificadores de las filas (los identificadores de los casos)</td>
+                                        <td class="py-2 px-4 border-b">`rownames(datos_pacientes)`</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 px-4 border-b">`nrow()`</td>
+                                        <td class="py-2 px-4 border-b">Indica cuántas filas tiene la tabla (el número total de casos)</td>
+                                        <td class="py-2 px-4 border-b">`nrow(datos_pacientes)`</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 px-4 border-b">`ncol()`</td>
+                                        <td class="py-2 px-4 border-b">Número de columnas en la tabla (el número de tipos de evidencia)</td>
+                                        <td class="py-2 px-4 border-b">`ncol(datos_pacientes)`</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 px-4">`length()`</td>
+                                        <td class="py-2 px-4">Devuelve cuántos elementos tiene el objeto (en un data.frame = columnas)</td>
+                                        <td class="py-2 px-4">`length(datos_pacientes)`</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <img src="https://placehold.co/400x250/F04A4C/FFFFFF?text=DataFrame+Functions" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                    </div>
+                </div>
+
+                <!-- Slide 7: str() y Crear desde R manualmente -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">Exploración Adicional y Creación Manual de Expedientes</h3>
+                        <p class="text-lg text-gray-700 mb-4">💡 También puedes usar `str()` para ver la estructura completa de un data.frame, detective. Es como un resumen detallado de tu expediente:</p>
+                        <pre class="bg-gray-100 p-2 rounded-md my-2 text-sm text-[#071E2D] text-left"><code>str(datos_pacientes)</code></pre>
+                        <p class="text-lg text-gray-700 font-medium mt-4 mb-2">🧮 **Crear desde R manualmente:**</p>
+                        <p class="text-lg text-gray-700">Como vimos, puedes construir una tabla uniendo varios vectores con `data.frame()`, creando tu propio expediente desde cero.</p>
+                        <img src="https://placehold.co/400x250/DEFF00/071E2D?text=STR+Manual+Create" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                    </div>
+                </div>
+
+                <!-- Slide 8: Abrir archivos existentes (tipos de archivo) -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">💾 Abrir y Importar Archivos Existentes: Accediendo a Evidencias Externas</h3>
+                        <p class="text-lg text-gray-700 font-medium mb-2">R permite importar archivos desde diversas fuentes. Aquí algunos tipos comunes que encontrarás en tu investigación, detective:</p>
+                        <div class="overflow-x-auto mx-auto max-w-2xl">
+                            <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
+                                <thead>
+                                    <tr>
+                                        <th class="py-2 px-4 border-b text-left text-gray-800">Tipo de archivo</th>
+                                        <th class="py-2 px-4 border-b text-left text-gray-800">Función</th>
+                                        <th class="py-2 px-4 border-b text-left text-gray-800">Paquete</th>
+                                        <th class="py-2 px-4 border-b text-left text-gray-800">Ejemplo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="py-2 px-4 border-b">.csv</td>
+                                        <td class="py-2 px-4 border-b">`read_csv()`</td>
+                                        <td class="py-2 px-4 border-b">`readr`</td>
+                                        <td class="py-2 px-4 border-b">`read_csv("datos.csv")`</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 px-4 border-b">.xlsx</td>
+                                        <td class="py-2 px-4 border-b">`read_excel()`</td>
+                                        <td class="py-2 px-4 border-b">`readxl`</td>
+                                        <td class="py-2 px-4 border-b">`read_excel("datos.xlsx")`</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 px-4 border-b">.RDS</td>
+                                        <td class="py-2 px-4 border-b">`readRDS()`</td>
+                                        <td class="py-2 px-4 border-b">`base`</td>
+                                        <td class="py-2 px-4 border-b">`readRDS("base_datos.rds")`</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 px-4">.dta (Stata)</td>
+                                        <td class="py-2 px-4">`read_dta()`</td>
+                                        <td class="py-2 px-4">`haven`</td>
+                                        <td class="py-2 px-4">`read_dta("salud_publica.dta")`</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <img src="https://placehold.co/400x250/AEC800/071E2D?text=Import+Files" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                    </div>
+                </div>
+
+                <!-- Slide 9: Ejemplo completo de importación y Conclusión -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">📍 Ejemplo Completo de Importación y Conclusión</h3>
+                        <p class="text-lg text-gray-700 font-medium mb-2">Aquí tienes un ejemplo completo, detective:</p>
+                        <pre class="bg-gray-100 p-2 rounded-md my-2 text-sm text-[#071E2D] text-left"><code>library(readr)
+
+# Importar datos de enfermedades infecciosas desde un CSV
+datos_brote <- read_csv("brote_dengue.csv")
+
+# Revisar estructura básica
+str(datos_brote)</code></pre>
+                        <p class="text-lg text-gray-700 font-medium mt-4 mb-2">✅ **Conclusión de la Pista 6**</p>
+                        <p class="text-lg text-gray-700">Tanto los **vectores** como los **data.frames** son esenciales para construir, organizar y analizar datos en R. Estas estructuras te permitirán representar pacientes, brotes, tratamientos y muchos otros aspectos clave en salud pública, de forma reproducible y eficiente. ¡El archivo de evidencias está en tus manos!</p>
+                        <p class="text-xl font-bold mt-4 text-[#AEC800]">Dominar su creación, exploración e importación será la base de tu trabajo como analista o investigador, detective.</p>
+                        <img src="https://placehold.co/400x250/106BA0/FFFFFF?text=Import+Conclusion" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                    </div>
+                </div>
+            </div>
+
+            <nav class="flex justify-between items-center w-full max-w-xl mx-auto mt-8">
+                <button id="prevBtnTema6" class="nav-button">Anterior</button>
+                <div id="slide-counter-tema6" class="text-sm font-bold"></div>
+                <button id="nextBtnTema6" class="nav-button">Siguiente</button>
+            </nav>
+        </section>
+
+        <!-- Sección Tema 7: Funciones en R (NUEVO) -->
+        <section id="tema7" class="section-padding">
+            <h2 class="text-4xl font-bold mb-4 text-[#071E2D]">Tema 7: Funciones en R: Automatizando el Pensamiento Analítico</h2>
+            <p class="text-lg text-gray-700 mb-6">Las funciones en R son bloques de código reutilizables que realizan tareas específicas. Aprenderemos a utilizarlas y a crear las nuestras propias, detective. ¡Serán tus asistentes automáticos!</p>
+
+            <div id="tema7-slides-container" class="relative min-h-[70vh] mb-8 slide-container">
+                <!-- Slide 1: ¿Qué es una función? -->
+                <div class="slide active">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-4 text-[#10BED2]">🔧 ¿Qué es una Función, detective?</h3>
+                        <p class="text-lg text-gray-700 mb-4">Una función en R es un conjunto de instrucciones que toma ciertos datos de entrada (input), los procesa mediante operaciones definidas, y devuelve un resultado (output).</p>
+                        <p class="text-lg text-gray-700 mb-6">Es como una receta para resolver un problema: tú introduces los ingredientes (variables), sigues los pasos (lógica), y obtienes un plato final (resultado). ¡Un truco más en tu arsenal!</p>
+                        <img src="https://placehold.co/400x250/F04A4C/FFFFFF?text=Function+Concept" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Este enfoque permite reutilizar código, automatizar tareas rutinarias y estructurar mejor tus análisis. ¡Eficiencia garantizada!</p>
+                    </div>
+                </div>
+
+                <!-- Slide 2: Componentes de una función -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">⚙️ Componentes de una Función: La Anatomía de un Automatismo</h3>
+                        <p class="text-lg text-gray-700 font-medium mb-2">Una función en R está compuesta por estas partes clave, como las piezas de un mecanismo de reloj, detective:</p>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>**Nombre**: cómo se identifica y llama la función. (Su "identidad")</li>
+                            <li>**Argumentos**: variables o valores que se entregan como entrada. (Las "pistas" que le das)</li>
+                            <li>**Cuerpo (body)**: operaciones que transforman los argumentos. (El "proceso de investigación" interno)</li>
+                            <li>**Salida (output)**: el resultado final que se desea obtener, que se devuelve con `return()`. (La "conclusión" de la investigación)</li>
+                        </ul>
+                        <img src="https://placehold.co/400x250/DEFF00/071E2D?text=Function+Components" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Cada parte es crucial para el funcionamiento de la "receta".</p>
+                    </div>
+                </div>
+
+                <!-- Slide 3: Ejemplo clásico: cálculo de IMC (fórmula y código) -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">📦 Ejemplo Clásico: Cálculo de IMC (Índice de Masa Corporal)</h3>
+                        <p class="text-lg text-gray-700 mb-4">Usamos el ejemplo del Índice de Masa Corporal (IMC), cuyo cálculo es una medida estándar en salud. La fórmula es:</p>
+                        <p class="text-center text-xl font-bold mb-4">\[ \text{IMC} = \frac{\text{peso (kg)}}{\text{talla (m)}^2} \]</p>
+                        <pre class="bg-gray-100 p-2 rounded-md my-4 text-sm text-[#071E2D] text-left"><code>IMC <- function(peso, talla) {
+  resultado <- peso / (talla^2)
+  return(resultado)
+}</code></pre>
+                        <img src="https://placehold.co/400x250/AEC800/071E2D?text=IMC+Formula+Code" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Una función simple para un cálculo común que puedes automatizar, detective.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 4: Ejemplo clásico: cálculo de IMC (uso) -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">Calculando el IMC: Poniendo la Función en Acción</h3>
+                        <p class="text-lg text-gray-700 mb-4">Si calculamos el IMC para una persona de 80 kg y 1.75 m. Observa la facilidad, detective:</p>
+                        <pre class="bg-gray-100 p-2 rounded-md my-4 text-sm text-[#071E2D] text-left"><code>IMC(peso = 80, talla = 1.75)
+# [1] 26.12245</code></pre>
+                        <img src="https://placehold.co/400x250/106BA0/FFFFFF?text=IMC+Usage" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Así es cómo se usa la función que acabamos de definir. ¡Una pieza de tu caso resuelta con un comando!</p>
+                    </div>
+                </div>
+
+                <!-- Slide 5: Nuevo ejemplo: tasa de ataque (fórmula y código) -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">🏥 Nuevo Ejemplo en Salud Pública: Tasa de Ataque</h3>
+                        <p class="text-lg text-gray-700 mb-4">La tasa de ataque es una medida clave durante brotes epidémicos. Nos ayuda a entender qué tan rápido se propaga una enfermedad. Se calcula como:</p>
+                        <p class="text-center text-xl font-bold mb-4">\[ \text{Tasa de ataque} = \frac{\text{número de casos nuevos}}{\text{población en riesgo}} \times 100 \]</p>
+                        <pre class="bg-gray-100 p-2 rounded-md my-4 text-sm text-[#071E2D] text-left"><code>tasa_ataque <- function(casos, poblacion) {
+  resultado <- (casos / poblacion) * 100
+  return(resultado)
+}</code></pre>
+                        <img src="https://placehold.co/400x250/071E2D/FFFFFF?text=Attack+Rate+Formula+Code" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Automatizando un cálculo epidemiológico esencial, detective.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 6: Nuevo ejemplo: tasa de ataque (uso) -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">Calculando la Tasa de Ataque: Obteniendo el Resultado de tu Pista</h3>
+                        <p class="text-lg text-gray-700 mb-4">Y utilizarla para calcular una tasa. Si tienes 25 casos en una población de 200 personas, detective:</p>
+                        <pre class="bg-gray-100 p-2 rounded-md my-4 text-sm text-[#071E2D] text-left"><code>tasa_ataque(casos = 25, poblacion = 200)
+# [1] 12.5</code></pre>
+                        <img src="https://placehold.co/400x250/F04A4C/FFFFFF?text=Attack+Rate+Usage" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Esta función puede integrarse fácilmente en análisis más grandes o aplicarse a múltiples localidades. ¡Multiplica tu capacidad de investigación!</p>
+                    </div>
+                </div>
+
+                <!-- Slide 7: ¿Por qué son tan valiosas las funciones? -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">🔍 ¿Por qué son tan valiosas las Funciones, detective?</h3>
+                        <p class="text-lg text-gray-700 font-medium mb-2">Las funciones aportan beneficios clave a tu flujo de trabajo, como nuevas ventajas para tu agencia:</p>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>**Eficiencia**: reducen la repetición de código (`DRY - Don't Repeat Yourself`). Menos trabajo manual, más tiempo para pensar.</li>
+                            <li>**Claridad**: agrupan operaciones complejas en una única etiqueta comprensible. Tu código es más fácil de "leer" y entender.</li>
+                            <li>**Reutilización**: puedes usarlas en distintos proyectos o con nuevos datos sin reescribir. Una solución para múltiples casos.</li>
+                            <li>**Mantenibilidad**: facilita la corrección de errores y la mejora del código. Si algo falla, sabes dónde buscar.</li>
+                        </ul>
+                        <img src="https://placehold.co/400x250/DEFF00/071E2D?text=Function+Benefits" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Son la clave para un análisis de datos más robusto y escalable. ¡Dominarlas te hará un detective de élite!</p>
+                    </div>
+                </div>
+
+                <!-- Slide 8: Conclusión -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">🎯 Conclusión: Tu Mente como Herramienta</h3>
+                        <p class="text-lg text-gray-700 mb-6">En R, las funciones te permiten formalizar procedimientos analíticos. Desde calcular un indicador como el IMC, hasta implementar modelos complejos en salud pública, las funciones son una herramienta central para transformar datos en decisiones. ¡Tu intelecto, automatizado!</p>
+                        <img src="https://placehold.co/400x250/AEC800/071E2D?text=Functions+Conclusion" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-xl font-bold mt-4 text-[#AEC800]">¿Te gustaría que desarrolláramos más ejemplos como funciones para tasas ajustadas, mortalidad o letalidad, detective? También puedo ayudarte a integrarlas en flujos de trabajo más amplios. 💡📈💻</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="flex justify-between items-center w-full max-w-xl mx-auto mt-8">
+                <button id="prevBtnTema7" class="nav-button">Anterior</button>
+                <div id="slide-counter-tema7" class="text-sm font-bold"></div>
+                <button id="nextBtnTema7" class="nav-button">Siguiente</button>
+            </nav>
+        </section>
+
+        <!-- Sección Tema 8: Librerías (NUEVO) -->
+        <section id="tema8" class="section-padding">
+            <h2 class="text-4xl font-bold mb-4 text-[#071E2D]">Tema 8: Librerías: Tus Herramientas Especializadas</h2>
+            <p class="text-lg text-gray-700 mb-6">En R, las "librerías" se refieren a conjuntos de funciones organizadas de manera lógica que pueden ser utilizadas para llevar a cabo diversas tareas, como análisis, limpieza y visualización de datos, entre otros, detective. ¡Son tus kits de herramientas de especialista!</p>
+
+            <div id="tema8-slides-container" class="relative min-h-[70vh] mb-8 slide-container">
+                <!-- Slide 1: Introducción a las Librerías -->
+                <div class="slide active">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-4 text-[#10BED2]">¿Qué son las Librerías en R, detective?</h3>
+                        <p class="text-lg text-gray-700 mb-6">Las librerías son colecciones de funciones y datos que extienden las capacidades de R, permitiéndote realizar tareas complejas con mayor facilidad. Son como las herramientas especializadas en el kit de un detective: cada una para un propósito único.</p>
+                        <img src="https://placehold.co/400x250/F04A4C/FFFFFF?text=R+Libraries+Intro" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">¡Exploremos algunas de las más útiles!</p>
+                    </div>
+                </div>
+
+                <!-- Slide 2: ggplot2 -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">ggplot2: El Arte de la Visualización de Evidencias</h3>
+                        <p class="text-lg text-gray-700 mb-4">Esta librería sirve para la creación de gráficos y visualizaciones de datos de alta calidad. Te permite presentar tus descubrimientos de manera clara y convincente, detective.</p>
+                        <pre class="bg-gray-100 p-2 rounded-md my-4 text-sm text-[#071E2D] text-left"><code># Cargar la librería
+library(ggplot2)
+
+# Ejemplo básico de gráfico
+ggplot(mtcars, aes(x = mpg, y = hp)) +
+  geom_point()</code></pre>
+                        <img src="https://placehold.co/400x250/DEFF00/071E2D?text=ggplot2" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Tu mejor aliado para contar historias con datos y revelar patrones ocultos.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 3: dplyr -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">dplyr: La Sala de Interrogatorios de los Datos</h3>
+                        <p class="text-lg text-gray-700 mb-4">Permite la manipulación y transformación eficiente de datos. Con `dplyr`, puedes filtrar, seleccionar, agrupar y resumir la información con la precisión de un interrogatorio experto, detective.</p>
+                        <pre class="bg-gray-100 p-2 rounded-md my-4 text-sm text-[#071E2D] text-left"><code># Cargar la librería
+library(dplyr)
+
+# Ejemplo: filtrar filas y seleccionar columnas
+mtcars %>%
+  filter(cyl == 4) %>%
+  select(mpg, hp)</code></pre>
+                        <img src="https://placehold.co/400x250/AEC800/071E2D?text=dplyr" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Perfecta para limpiar y organizar tus bases de datos, ¡dejándolas impecables para el análisis!</p>
+                    </div>
+                </div>
+
+                <!-- Slide 4: tidyr -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">tidyr: Organizando la Escena del Crimen de tus Datos</h3>
+                        <p class="text-lg text-gray-700 mb-4">Utilizada para organizar y reorganizar datos en un formato tabular ordenado (tidy data). Es fundamental para asegurar que cada variable y observación esté en su lugar correcto, como organizar la evidencia recolectada, detective.</p>
+                        <pre class="bg-gray-100 p-2 rounded-md my-4 text-sm text-[#071E2D] text-left"><code># Cargar la librería
+library(tidyr)
+
+# Ejemplo: de ancho a largo (pivot_longer)
+data_wide <- data.frame(
+  id = 1,
+  val_a = 10,
+  val_b = 20
+)
+data_long <- data_wide %>%
+  pivot_longer(starts_with("val"), names_to = "variable", values_to = "valor")</code></pre>
+                        <img src="https://placehold.co/400x250/106BA0/FFFFFF?text=tidyr" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Transforma tus datos para análisis más sencillos y una comprensión más profunda.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 5: readr -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">readr: La Puerta de Entrada y Salida de tus Evidencias</h3>
+                        <p class="text-lg text-gray-700 mb-4">Sirve para leer y escribir datos en formatos como CSV, TSV y otros. Es la forma más eficiente de importar tus bases de datos o exportar tus resultados, detective.</p>
+                        <pre class="bg-gray-100 p-2 rounded-md my-4 text-sm text-[#071E2D] text-left"><code># Cargar la librería
+library(readr)
+
+# Ejemplo: leer un archivo CSV
+mis_datos <- read_csv("ruta/a/mi_archivo.csv")</code></pre>
+                        <img src="https://placehold.co/400x250/071E2D/FFFFFF?text=readr" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">La puerta de entrada y salida para tus datos. ¡Asegura que tu información fluya sin obstáculos!</p>
+                    </div>
+                </div>
+
+                <!-- Slide 6: plyr -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">plyr: División y Conquista de los Datos</h3>
+                        <p class="text-lg text-gray-700 mb-4">Funciona para dividir, aplicar y combinar datos de manera eficiente. Piensa en ella como tu estrategia para desglosar un caso complejo en partes manejables, analizarlas y luego reunir las conclusiones, detective.</p>
+                        <pre class="bg-gray-100 p-2 rounded-md my-4 text-sm text-[#071E2D] text-left"><code># Cargar la librería
+library(plyr)
+
+# Ejemplo: calcular la media por grupo (ddply)
+# df <- data.frame(grupo = c("A","A","B","B"), valor = c(1,2,3,4))
+# resultado <- ddply(df, "grupo", summarise, media_valor = mean(valor))</code></pre>
+                        <img src="https://placehold.co/400x250/F04A4C/FFFFFF?text=plyr" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Útil para operaciones de agregación y resumen. ¡Una técnica avanzada para tu kit!</p>
+                    </div>
+                </div>
+
+                <!-- Slide 7: Meta-librerías (Tidyverse) y Conclusión -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">Meta-Librerías: El Poder de Tidyverse</h3>
+                        <p class="text-lg text-gray-700 mb-4">A su vez, hay **meta-librerías**, es decir, aquellas que combinan varias librerías en un solo paquete. Son como un kit de herramientas completo que ya trae todo lo necesario para tu investigación, detective.</p>
+                        <p class="text-lg text-gray-700 mb-6">Un ejemplo de estas es la meta-librería **Tidyverse**, que incluye `ggplot2`, `dplyr`, `tidyr`, `readr`, entre otras, proporcionando un flujo de trabajo cohesivo y potente.</p>
+                        <img src="https://placehold.co/400x250/DEFF00/071E2D?text=Tidyverse" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-xl font-bold mt-4 text-[#AEC800]">Las librerías son herramientas clave para desbloquear el verdadero potencial de R en tus análisis de datos. ¡Tu kit de detective está cada vez más completo!</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="flex justify-between items-center w-full max-w-xl mx-auto mt-8">
+                <button id="prevBtnTema8" class="nav-button">Anterior</button>
+                <div id="slide-counter-tema8" class="text-sm font-bold"></div>
+                <button id="nextBtnTema8" class="nav-button">Siguiente</button>
+            </nav>
+        </section>
+        
+        <!-- Sección Tema 9: Manipulación de datos con Tidyverse (Antiguo Tema 8) -->
+        <section id="tema9" class="section-padding">
+            <h2 class="text-4xl font-bold mb-4 text-[#071E2D]">Tema 9: Manipulación de Datos con Tidyverse: El Arte de Interrogar Evidencias</h2>
+            <p class="text-lg text-gray-700 mb-6">Este tema es central para el análisis de datos, detective. Nos sumergiremos en el ecosistema `tidyverse`, una colección de paquetes diseñados para trabajar con datos de manera consistente y eficiente. Cubriremos `dplyr` para la manipulación de datos (`filter`, `select`, `mutate`, `group_by`, `summarise`) y `readr` para importar y exportar datos. ¡Prepárate para extraer la verdad de los datos!</p>
+
+            <div id="tema9-slides-container" class="relative min-h-[70vh] mb-8 slide-container">
+                <!-- Slide 1: Introducción a Tidyverse -->
+                <div class="slide active">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-4 text-[#10BED2]">🧠 Introducción a Tidyverse: Tu Aliado en la Limpieza de Pistas</h3>
+                        <p class="text-lg text-gray-700 mb-4">Tidyverse es una **meta-librería** que reúne múltiples paquetes diseñados para manipular, transformar y limpiar datos en R. Su nombre proviene de *Tidy* (ordenado, estructurado), haciendo referencia a la limpieza y organización de datos para análisis eficientes.</p>
+                        <img src="https://placehold.co/400x250/F04A4C/FFFFFF?text=Tidyverse+Intro" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Un ecosistema para datos limpios y organizados. ¡Imprescindible para cualquier investigación seria!</p>
+                    </div>
+                </div>
+
+                <!-- Slide 2: Paquetes de Tidyverse e Instalación -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">Paquetes de Tidyverse e Instalación: Montando tu Equipo de Élite</h3>
+                        <p class="text-lg text-gray-700 mb-4">Al cargar `tidyverse`, se activan automáticamente varias librerías esenciales, como `dplyr`, `tidyr`, `tibble`, `readr`, `purrr`, entre otras. Estas herramientas permiten manejar grandes volúmenes de datos y realizar tareas como filtrado, agrupación, transformación y visualización. ¡Tu equipo de especialistas a tu disposición!</p>
+                        <p class="text-lg text-gray-700 font-medium mt-4 mb-2">📌 **Instalación de Tidyverse en R:**</p>
+                        <pre class="bg-gray-100 p-2 rounded-md my-2 text-sm text-[#071E2D] text-left"><code>install.packages("tidyverse")  # Solo se instala una vez
+library(tidyverse)  # Se carga cada vez que abrimos RStudio</code></pre>
+                        <img src="https://placehold.co/400x250/DEFF00/071E2D?text=Tidyverse+Install" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Recuerda instalar una sola vez, pero cargar en cada sesión para que tu equipo esté listo.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 3: Importar datos en R con Tidyverse (readxl) -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">📂 Importar Datos en R con Tidyverse: Recopilando Evidencias</h3>
+                        <p class="text-lg text-gray-700 mb-4">Para analizar información sobre enfermedades infecciosas, es común trabajar con bases de datos en formatos como Excel, CSV, RDS y otros. Por ejemplo, si tienes un archivo `datos_covid.xlsx`, puedes importarlo con `readxl` para tu análisis, detective:</p>
+                        <pre class="bg-gray-100 p-2 rounded-md my-4 text-sm text-[#071E2D] text-left"><code>library(readxl)  # Necesario para trabajar con archivos Excel
+dat <- read_excel("data/datos_covid.xlsx")</code></pre>
+                        <p class="text-sm text-gray-500 mt-2">💡 **Organización recomendada:** Se sugiere crear una carpeta llamada `data` en el directorio de trabajo y almacenar los archivos de datos allí. ¡Mantén tus evidencias en orden!</p>
+                        <img src="https://placehold.co/400x250/AEC800/071E2D?text=Import+Data" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                    </div>
+                </div>
+
+                <!-- Slide 4: Uso del operador PIPE %>% (sin PIPE) -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">🔗 Uso del Operador PIPE `%>%`: La Lógica del Detective (Sin PIPE)</h3>
+                        <p class="text-lg text-gray-700 mb-4">El operador tubería (`%>%`) es una herramienta clave de Tidyverse que encadena funciones, evitando que el código sea difícil de leer. Compara esta forma de escribir un análisis; es como intentar seguir varias pistas desorganizadas, detective:</p>
+                        <pre class="bg-gray-100 p-2 rounded-md my-4 text-sm text-[#071E2D] text-left"><code>datos_filtrados <- filter(dat, edad > 18)
+datos_con_esquema <- mutate(datos_filtrados, esquema = ifelse(dosis > 2, "Completo", "Incompleto"))
+datos_agrupados <- group_by(datos_con_esquema, esquema)
+datos_por_esquema <- summarise(datos_agrupados, personas = n())</code></pre>
+                        <img src="https://placehold.co/400x250/106BA0/FFFFFF?text=No+Pipe+Operator" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">El código puede volverse complejo y difícil de seguir, como un laberinto de pistas.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 5: Uso del operador PIPE %>% (con PIPE) -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">🔗 Uso del Operador PIPE `%>%`: La Lógica del Detective (Con PIPE)</h3>
+                        <p class="text-lg text-gray-700 mb-4">**Con PIPE (`%>%`) – Más legible y eficiente:** Ahora, mira cómo el operador `%>%` te permite encadenar tus acciones de investigación de forma fluida, como un plan de ataque perfectamente ejecutado, detective:</p>
+                        <pre class="bg-gray-100 p-2 rounded-md my-4 text-sm text-[#071E2D] text-left"><code>datos_por_esquema <- dat %>%
+  filter(edad > 18) %>%
+  mutate(esquema = ifelse(dosis > 2, "Completo", "Incompleto")) %>%
+  group_by(esquema) %>%
+  summarise(personas = n())</code></pre>
+                        <p class="text-lg text-gray-700 font-medium mt-4 mb-2">📌 **Ventajas de `%>%`:**</p>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-2 max-w-2xl mx-auto">
+                            <li>✔️ Hace el código más legible.</li>
+                            <li>✔️ Reduce líneas innecesarias.</li>
+                            <li>✔️ Encadena funciones sin necesidad de múltiples asignaciones.</li>
+                        </ul>
+                        <img src="https://placehold.co/400x250/071E2D/FFFFFF?text=Pipe+Operator" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Un cambio pequeño, un gran impacto en la legibilidad de tu investigación.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 6: Funciones esenciales de Tidyverse: glimpse() y summarise() -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">🔍 Funciones esenciales de Tidyverse: `glimpse()` y `summarise()`</h3>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-4 max-w-2xl mx-auto">
+                            <li>**1️⃣ `glimpse()` – Exploración rápida de datos**
+                                <p class="ml-4">Muestra un resumen general del data.frame: número de filas, columnas, nombres de variables y tipos de datos. ¡Es como tu primera mirada rápida a la escena del crimen, detective!</p>
+                                <pre class="bg-gray-100 p-2 rounded-md my-2 text-sm text-[#071E2D] text-left"><code>dat %>% glimpse()</code></pre>
+                            </li>
+                            <li>**2️⃣ `summarise()` – Estadísticas resumidas**
+                                <p class="ml-4">Calcula métricas como la media de edad y el total de registros en la tabla. Ideal para obtener las cifras clave de tu caso.</p>
+                                <pre class="bg-gray-100 p-2 rounded-md my-2 text-sm text-[#071E2D] text-left"><code>dat %>% summarise(media_edad = mean(edad), casos_totales = n())</code></pre>
+                            </li>
+                        </ul>
+                        <img src="https://placehold.co/400x250/F04A4C/FFFFFF?text=Glimpse+Summarise" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                    </div>
+                </div>
+
+                <!-- Slide 7: Funciones esenciales de Tidyverse: group_by() -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">🔍 Funciones esenciales de Tidyverse: `group_by()`</h3>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-4 max-w-2xl mx-auto">
+                            <li>**3️⃣ `group_by()` – Agrupación de datos**
+                                <p class="ml-4">Para análisis epidemiológicos, podemos agrupar datos por una variable, como sexo, y calcular indicadores por grupo. Es como clasificar a los sospechosos por características comunes, detective.</p>
+                                <pre class="bg-gray-100 p-2 rounded-md my-2 text-sm text-[#071E2D] text-left"><code>dat %>%
+  group_by(sexo) %>%
+  summarise(casos = n(), promedio_edad = mean(edad))</code></pre>
+                            </li>
+                        </ul>
+                        <img src="https://placehold.co/400x250/DEFF00/071E2D?text=GroupBy" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                    </div>
+                </div>
+
+                <!-- Slide 8: Funciones esenciales de Tidyverse: select() y filter() -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">🔍 Funciones esenciales de Tidyverse: `select()` y `filter()`</h3>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-4 max-w-2xl mx-auto">
+                            <li>**4️⃣ `select()` – Extraer columnas específicas**
+                                <p class="ml-4">Si solo quieres trabajar con ciertas variables, como edad y sexo. Es como centrarte solo en las pistas relevantes para el caso, detective.</p>
+                                <pre class="bg-gray-100 p-2 rounded-md my-2 text-sm text-[#071E2D] text-left"><code>dat %>% select(edad, sexo)</code></pre>
+                            </li>
+                            <li>**5️⃣ `filter()` – Filtrar registros según criterios**
+                                <p class="ml-4">Para obtener registros de pacientes menores de 28 años y sexo femenino. Esto te permite aislar los casos de interés para una investigación más profunda.</p>
+                                <pre class="bg-gray-100 p-2 rounded-md my-2 text-sm text-[#071E2D] text-left"><code>dat %>% filter(sexo == "F", edad <= 28)</code></pre>
+                            </li>
+                        </ul>
+                        <img src="https://placehold.co/400x250/AEC800/071E2D?text=Select+Filter" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                    </div>
+                </div>
+
+                <!-- Slide 9: Funciones esenciales de Tidyverse: arrange() -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">🔍 Funciones esenciales de Tidyverse: `arrange()`</h3>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-4 max-w-2xl mx-auto">
+                            <li>**6️⃣ `arrange()` – Ordenar registros**
+                                <p class="ml-4">Ordena datos por edad de menor a mayor. Es como organizar tus expedientes cronológicamente o por importancia, detective.</p>
+                                <pre class="bg-gray-100 p-2 rounded-md my-2 text-sm text-[#071E2D] text-left"><code>dat %>% arrange(edad)</code></pre>
+                                <p class="ml-4 mt-2">Para ordenarlo de mayor a menor, usamos `desc()`:</p>
+                                <pre class="bg-gray-100 p-2 rounded-md my-2 text-sm text-[#071E2D] text-left"><code>dat %>% arrange(desc(edad))</code></pre>
+                            </li>
+                        </ul>
+                        <img src="https://placehold.co/400x250/106BA0/FFFFFF?text=Arrange+Data" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                    </div>
+                </div>
+
+                <!-- Slide 10: Funciones esenciales de Tidyverse: mutate() y rename() -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">🔍 Funciones esenciales de Tidyverse: `mutate()` y `rename()`</h3>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-4 max-w-2xl mx-auto">
+                            <li>**7️⃣ `mutate()` – Crear nuevas variables**
+                                <p class="ml-4">Si quieres agregar una nueva columna con información adicional. Como añadir una nueva categoría a tu análisis de pistas, detective.</p>
+                                <pre class="bg-gray-100 p-2 rounded-md my-2 text-sm text-[#071E2D] text-left"><code>dat %>% mutate(dpto = toupper(nombre_departamento))</code></pre>
+                            </li>
+                            <li>**8️⃣ `rename()` – Modificar nombres de variables**
+                                <p class="ml-4">Si quieres renombrar una columna para facilitar la interpretación. Como cambiar el nombre de un código secreto a algo más claro para tu informe, detective.</p>
+                                <pre class="bg-gray-100 p-2 rounded-md my-2 text-sm text-[#071E2D] text-left"><code>dat %>% rename(departamento = nombre_departamento)</code></pre>
+                            </li>
+                        </ul>
+                        <img src="https://placehold.co/400x250/071E2D/FFFFFF?text=Mutate+Rename" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                    </div>
+                </div>
+
+                <!-- Slide 11: Funciones esenciales de Tidyverse: slice() y Conclusión -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">🔍 Funciones esenciales de Tidyverse: `slice()`</h3>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-4 max-w-2xl mx-auto">
+                            <li>**9️⃣ `slice()` – Extraer filas específicas**
+                                <p class="ml-4">Para seleccionar un rango de registros, por ejemplo de la fila 10 a la 15. Esto te permite enfocarte en un segmento particular de la evidencia, detective.</p>
+                                <pre class="bg-gray-100 p-2 rounded-md my-2 text-sm text-[#071E2D] text-left"><code>dat %>% slice(10:15)</code></pre>
+                            </li>
+                        </ul>
+                        <p class="text-lg text-gray-700 font-medium mt-6 mb-2">🚀 **Conclusión de tu Pista 9**</p>
+                        <p class="text-lg text-gray-700">Tidyverse es una herramienta fundamental para la manipulación de datos en R. Su combinación de funciones permite limpiar, transformar y analizar información de manera eficiente, lo cual es clave en el estudio de brotes epidemiológicos, vigilancia en salud pública y modelado de enfermedades infecciosas.</p>
+                        <p class="text-xl font-bold mt-4 text-[#AEC800]">¡Has dominado las herramientas esenciales para la manipulación de datos con Tidyverse, detective! ¡Las evidencias están claras!</p>
+                        <img src="https://placehold.co/400x250/F04A4C/FFFFFF?text=Tidyverse+Conclusion" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                    </div>
+                </div>
+            </div>
+
+            <nav class="flex justify-between items-center w-full max-w-xl mx-auto mt-8">
+                <button id="prevBtnTema9" class="nav-button">Anterior</button>
+                <div id="slide-counter-tema9" class="text-sm font-bold"></div>
+                <button id="nextBtnTema9" class="nav-button">Siguiente</button>
+            </nav>
+        </section>
+
+        <!-- Sección Reto -->
+        <section id="reto" class="section-padding">
+            <h2 class="text-4xl font-bold mb-4 text-[#071E2D]">📊 Actividad de Afianzamiento: Manipulación de Datos de COVID-19 en R con Tidyverse</h2>
+            <p class="text-lg text-gray-700 mb-6">Esta actividad práctica te permitirá afianzar tus conocimientos sobre la manipulación de datos con Tidyverse. ¡Es hora de resolver un caso real, detective!</p>
+
+            <div id="reto-slides-container" class="relative min-h-[70vh] mb-8 slide-container">
+                <!-- Slide 1: Objetivo y Carga de Datos -->
+                <div class="slide active">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-4 text-[#10BED2]">Objetivo y Carga de Datos: Recopilando el Expediente COVID-19</h3>
+                        <p class="text-lg text-gray-700 mb-4">Practica la manipulación de datos en R utilizando Tidyverse, explorando registros de casos de COVID-19 en Latinoamérica. Aplicaremos técnicas de limpieza, filtrado, agrupación y análisis de datos para extraer información relevante, ¡como lo haría un equipo de élite!</p>
+                        <p class="text-lg text-gray-700 font-medium mb-2">📂 **Carga de Datos:**</p>
+                        <p class="text-lg text-gray-700 mb-4">Descarga los datos desde el siguiente enlace y cárgalos en R:</p>
+                        <pre class="bg-gray-100 p-2 rounded-md my-4 text-sm text-[#071E2D] text-left"><code>url <- "https://github.com/TRACE-LAC/TRACE-LAC-data/blob/main/datos_covid.RDS?raw=true"
+covid19 <- readr::read_rds(url)</code></pre>
+                        <img src="https://placehold.co/400x250/F04A4C/FFFFFF?text=Data+Loading" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Asegúrate de tener conexión a internet para descargar el archivo del caso.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 2: Paso 1: Limpieza de Nombres de Variables -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">📌 Paso 1: Limpieza de Nombres de Variables: Dando Sentido a las Pistas</h3>
+                        <p class="text-lg text-gray-700 mb-4">Los nombres de las columnas pueden contener caracteres especiales, espacios o tildes, lo que podría causar errores en el análisis. Usa la función `standardize_column_names()` del paquete `cleanepi` para estandarizar los nombres. ¡Es como descifrar códigos, detective!</p>
+                        <pre class="bg-gray-100 p-2 rounded-md my-4 text-sm text-[#071E2D] text-left"><code># Instalar el paquete cleanepi si no lo tienes
+# install.packages("cleanepi") 
+library(cleanepi)
+
+# Limpiar nombres de las columnas
+names(covid19) <- cleanepi::standardize_column_names(names(covid19))
+
+# Verifica los nombres estandarizados:
+names(covid19)</code></pre>
+                        <img src="https://placehold.co/400x250/DEFF00/071E2D?text=Clean+Names" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">La limpieza de nombres es un paso crucial en la preparación de datos. ¡No queremos pistas confusas!</p>
+                    </div>
+                </div>
+
+                <!-- Slide 3: Ejemplo de Manipulación de Datos -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">📌 Ejemplo de Manipulación de Datos: Analizando los Primeros Indicios</h3>
+                        <p class="text-lg text-gray-700 mb-4">Vamos a explorar algunos métodos clave para organizar la base de datos. ¡Como el primer análisis forense!</p>
+                        <p class="text-lg text-gray-700 font-medium mb-2">**🔹 Ejemplo: Calcular la proporción de casos fallecidos por sexo.**</p>
+                        <pre class="bg-gray-100 p-2 rounded-md my-4 text-sm text-[#071E2D] text-left"><code>casos_fallecidos <- covid19 %>%
+  filter(estado_final == "Fallecido") %>%
+  group_by(sexo) %>%
+  summarise(proporcion = n() / nrow(covid19) * 100)</code></pre>
+                        <p class="text-lg text-gray-700 mt-4 mb-2">📌 **Interpretación:** Este código filtra los registros de pacientes fallecidos y calcula el porcentaje de cada grupo por sexo. Así sabemos dónde están las huellas más débiles.</p>
+                        <img src="https://placehold.co/400x250/AEC800/071E2D?text=Data+Manipulation+Example" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Un ejemplo práctico de cómo combinar `filter`, `group_by` y `summarise`. ¡El poder de Tidyverse en acción!</p>
+                    </div>
+                </div>
+
+                <!-- Slide 4: Reto: Preguntas 1, 2, 3 -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">💡 Reto: Aplicación de Técnicas de Tidyverse - Primera Ronda de Preguntas</h3>
+                        <p class="text-lg text-gray-700 mb-4">Ahora, detective, resuelve los siguientes ejercicios. ¡Son tus primeras tareas de investigación en solitario!</p>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-4 max-w-2xl mx-auto">
+                            <li>**1️⃣** Filtra los datos para obtener solo los casos en estado "Moderado" o "Grave".</li>
+                            <li>**2️⃣** Agrupa los casos por tipo de contagio y cuenta cuántos hay en cada grupo.</li>
+                            <li>**3️⃣** Ordena los datos por edad de mayor a menor y extrae las 10 primeras filas.</li>
+                        </ul>
+                        <img src="https://placehold.co/400x250/106BA0/FFFFFF?text=Challenge+1-3" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">¡Pon a prueba tus habilidades con `filter`, `group_by`, `summarise` y `arrange`!</p>
+                    </div>
+                </div>
+
+                <!-- Slide 5: Reto: Preguntas 4, 5, 6 -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">💡 Reto: Continuación de Ejercicios - Desafíos Avanzados</h3>
+                        <ul class="list-disc list-inside text-left text-gray-700 space-y-4 max-w-2xl mx-auto">
+                            <li>**4️⃣** Renombra la variable `sintomas` por `descripcion_sintomas`.</li>
+                            <li>**5️⃣** Calcula la media de presión sistólica y diastólica para pacientes fallecidos.</li>
+                            <li>**6️⃣** Filtra y agrupa los datos por estado final y genera una tabla con el número total de hospitalizaciones recientes en cada grupo.</li>
+                        </ul>
+                        <p class="text-lg text-gray-700 font-medium mt-6 mb-2">📌 **Consejo, detective:** Usa las funciones de Tidyverse (`filter()`, `group_by()`, `summarise()`, `arrange()`, `rename()`, `mutate()`, `select()`, `slice()`) para resolverlos. ¡Combina tus herramientas!</p>
+                        <img src="https://placehold.co/400x250/071E2D/FFFFFF?text=Challenge+4-6" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500 mt-2">Combina funciones para soluciones más complejas, ¡como un caso de múltiples sospechosos!</p>
+                    </div>
+                </div>
+
+                <!-- Slide 6: Conclusión del Reto -->
+                <div class="slide">
+                    <div class="detective-card text-center p-8">
+                        <h3 class="text-2xl font-semibold mb-3 text-[#10BED2]">🚀 Conclusión del Reto: ¡Caso Cerrado!</h3>
+                        <p class="text-lg text-gray-700 mb-6">Esta actividad fortalece el uso de filtrado, agrupación, transformación y análisis con Tidyverse, esenciales para el manejo de bases de datos en epidemiología. ¡Has demostrado ser un detective de datos excepcional!</p>
+                        <img src="https://placehold.co/400x250/F04A4C/FFFFFF?text=Challenge+Complete" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+                        <p class="text-xl font-bold mt-4 text-[#AEC800]">¡Excelente trabajo, detective! Has aplicado tus conocimientos para resolver desafíos de datos. ¡Sigue así, tu reputación crece!</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="flex justify-between items-center w-full max-w-xl mx-auto mt-8">
+                <button id="prevBtnReto" class="nav-button">Anterior</button>
+                <div id="slide-counter-reto" class="text-sm font-bold"></div>
+                <button id="nextBtnReto" class="nav-button">Siguiente</button>
+            </nav>
+        </section>
+
+        <!-- Sección Evaluación -->
+        <section id="evaluacion" class="section-padding detective-card">
+            <h2 class="text-4xl font-bold mb-4 text-[#071E2D]">📝 Evaluación: Pon a Prueba tus Habilidades de Detective</h2>
+            <p class="text-lg text-gray-700 mb-6">Selecciona la respuesta correcta para cada pregunta basada en el contenido de esta unidad, detective. ¡Es hora de demostrar tus conocimientos!</p>
+
+            <form class="space-y-8">
+                <div>
+                    <p class="font-semibold text-lg mb-2">1. ¿Cuál es el propósito principal de R en el análisis de datos?</p>
+                    <div class="ml-4 space-y-2">
+                        <label class="block"><input type="radio" name="q1" value="a" class="mr-2">a) Diseño gráfico avanzado</label>
+                        <label class="block"><input type="radio" name="q1" value="b" class="mr-2">b) Redacción de documentos</label>
+                        <label class="block"><input type="radio" name="q1" value="c" class="mr-2">c) Análisis estadístico y visualización de datos</label>
+                        <label class="block"><input type="radio" name="q1" value="d" class="mr-2">d) Gestión de bases de datos relacionales</label>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="font-semibold text-lg mb-2">2. ¿Qué panel de RStudio se utiliza para escribir y editar código de forma organizada?</p>
+                    <div class="ml-4 space-y-2">
+                        <label class="block"><input type="radio" name="q2" value="a" class="mr-2">a) Consola</label>
+                        <label class="block"><input type="radio" name="q2" value="b" class="mr-2">b) Entorno</label>
+                        <label class="block"><input type="radio" name="q2" value="c" class="mr-2">c) Visualizador</label>
+                        <label class="block"><input type="radio" name="q2" value="d" class="mr-2">d) Editor</label>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="font-semibold text-lg mb-2">3. ¿Qué tipo de dato en R se utiliza para almacenar valores de verdadero o falso?</p>
+                    <div class="ml-4 space-y-2">
+                        <label class="block"><input type="radio" name="q3" value="a" class="mr-2">a) Character</label>
+                        <label class="block"><input type="radio" name="q3" value="b" class="mr-2">b) Numeric</label>
+                        <label class="block"><input type="radio" name="q3" value="c" class="mr-2">c) Logical</label>
+                        <label class="block"><input type="radio" name="q3" value="d" class="mr-2">d) Integer</label>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="font-semibold text-lg mb-2">4. ¿Cuál es el operador de asignación preferido en R para variables generales?</p>
+                    <div class="ml-4 space-y-2">
+                        <label class="block"><input type="radio" name="q4" value="a" class="mr-2">a) `=`</label>
+                        <label class="block"><input type="radio" name="q4" value="b" class="mr-2">b) `==`</label>
+                        <label class="block"><input type="radio" name="q4" value="c" class="mr-2">c) `<-`</label>
+                        <label class="block"><input type="radio" name="q4" value="d" class="mr-2">d) `->`</label>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="font-semibold text-lg mb-2">5. ¿Cuál es la principal característica de un vector en R?</p>
+                    <div class="ml-4 space-y-2">
+                        <label class="block"><input type="radio" name="q5" value="a" class="mr-2">a) Contiene elementos de diferentes tipos de datos</label>
+                        <label class="block"><input type="radio" name="q5" value="b" class="mr-2">b) Agrupa vectores como columnas, pero con diferente número de filas</label>
+                        <label class="block"><input type="radio" name="q5" value="c" class="mr-2">c) Es una secuencia ordenada de elementos del mismo tipo de dato</label>
+                        <label class="block"><input type="radio" name="q5" value="d" class="mr-2">d) Es una tabla de dos dimensiones con filas y columnas no relacionadas</label>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="font-semibold text-lg mb-2">6. ¿Qué función se utiliza para crear una nueva variable (columna) en un data.frame con Tidyverse?</p>
+                    <div class="ml-4 space-y-2">
+                        <label class="block"><input type="radio" name="q6" value="a" class="mr-2">a) `filter()`</label>
+                        <label class="block"><input type="radio" name="q6" value="b" class="mr-2">b) `select()`</label>
+                        <label class="block"><input type="radio" name="q6" value="c" class="mr-2">c) `mutate()`</label>
+                        <label class="block"><input type="radio" name="q6" value="d" class="mr-2">d) `summarise()`</label>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="font-semibold text-lg mb-2">7. El operador tubería (`%>%`) en Tidyverse tiene como principal ventaja:</p>
+                    <div class="ml-4 space-y-2">
+                        <label class="block"><input type="radio" name="q7" value="a" class="mr-2">a) Realizar cálculos matemáticos complejos</label>
+                        <label class="block"><input type="radio" name="q7" value="b" class="mr-2">b) Encadenar funciones de manera más legible y eficiente</label>
+                        <label class="block"><input type="radio" name="q7" value="c" class="mr-2">c) Guardar automáticamente el código en un archivo</label>
+                        <label class="block"><input type="radio" name="q7" value="d" class="mr-2">d) Crear gráficos interactivos</label>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="font-semibold text-lg mb-2">8. ¿Qué librería de Tidyverse es utilizada principalmente para la manipulación y transformación eficiente de datos?</p>
+                    <div class="ml-4 space-y-2">
+                        <label class="block"><input type="radio" name="q8" value="a" class="mr-2">a) `ggplot2`</label>
+                        <label class="block"><input type="radio" name="q8" value="b" class="mr-2">b) `readr`</label>
+                        <label class="block"><input type="radio" name="q8" value="c" class="mr-2">c) `tidyr`</label>
+                        <label class="block"><input type="radio" name="q8" value="d" class="mr-2">d) `dplyr`</label>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="font-semibold text-lg mb-2">9. ¿Cuál de los siguientes es un componente esencial de una función en R?</p>
+                    <div class="ml-4 space-y-2">
+                        <label class="block"><input type="radio" name="q9" value="a" class="mr-2">a) Solo el nombre</label>
+                        <label class="block"><input type="radio" name="q9" value="b" class="mr-2">b) Argumentos, cuerpo y salida</label>
+                        <label class="block"><input type="radio" name="q9" value="c" class="mr-2">c) Únicamente la salida</label>
+                        <label class="block"><input type="radio" name="q9" value="d" class="mr-2">d) Solo el nombre y la salida</label>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="font-semibold text-lg mb-2">10. Para leer archivos de datos en formatos como CSV o TSV en R, ¿cuál es la librería de Tidyverse recomendada?</p>
+                    <div class="ml-4 space-y-2">
+                        <label class="block"><input type="radio" name="q10" value="a" class="mr-2">a) `dplyr`</label>
+                        <label class="block"><input type="radio" name="q10" value="b" class="mr-2">b) `ggplot2`</label>
+                        <label class="block"><input type="radio" name="q10" value="c" class="mr-2">c) `readr`</label>
+                        <label class="block"><input type="radio" name="q10" value="d" class="mr-2">d) `purrr`</label>
+                    </div>
+                </div>
+            </form>
+            <p class="text-sm text-gray-500 mt-8">Las respuestas correctas no se muestran aquí, detective, ¡pero esperamos que hayas respondido correctamente!</p>
+        </section>
+
+        <!-- Sección Despedida -->
+        <section id="despedida" class="section-padding detective-card">
+            <h2 class="text-4xl font-bold mb-4 text-[#071E2D]">👋 Despedida: ¡Hasta la Próxima Unidad, Detective!</h2>
+            <p class="text-lg text-gray-700 mb-6">¡Felicidades por completar esta unidad, detective! Ha sido un placer guiarte a través del fascinante mundo de R y RStudio en el análisis de datos para la salud pública. Has resuelto casos importantes y descubierto nuevas habilidades.</p>
+            <p class="text-lg text-gray-700 mb-6">Has adquirido habilidades fundamentales que te permitirán abordar desafíos complejos y transformar datos en información valiosa para la toma de decisiones. Tu licencia de detective de datos está creciendo con cada descubrimiento.</p>
+            <p class="text-xl font-bold mt-6 text-[#AEC800]">Te invitamos a seguir explorando las siguientes unidades del curso, donde profundizaremos en temas más avanzados y herramientas aún más potentes. ¡El misterio de los datos continúa y tus habilidades de detective seguirán creciendo!</p>
+            <img src="imagenes/listo.png" onerror="this.onerror=null;this.src='https://placehold.co/400x250/106BA0/FFFFFF?text=Goodbye';" alt="" class="mx-auto my-4 rounded-lg shadow-md">
+        </section>
+
+        <!-- Sección Bibliografía -->
+        <section id="bibliografia" class="section-padding detective-card">
+            <h2 class="text-4xl font-bold mb-4 text-[#071E2D]">📚 Bibliografía: Tu Expediente de Referencias</h2>
+            <p class="text-lg text-gray-700 mb-4">A continuación, se listan las principales referencias utilizadas en esta unidad, detective. ¡Siempre es bueno tener tus fuentes a mano!</p>
+            <ul class="list-disc list-inside text-left text-gray-700 space-y-2">
+                <li>**R Project for Statistical Computing:** <a href="https://www.r-project.org/" target="_blank" class="text-[#AEC800] hover:underline">https://www.r-project.org/</a></li>
+                <li>**TRACE-LAC - Taller R y RStudio:** <a href="https://epiverse-trace.github.io/epitkit/Taller-R-RStudio.html" target="_blank" class="text-[#AEC800] hover:underline">https://epiverse-trace.github.io/epitkit/Taller-R-RStudio.html</a></li>
+            </ul>
+        </section>
+
+    </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            let currentSlide = 0;
-            const slides = document.querySelectorAll('.slide');
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            const slideCounter = document.getElementById('slide-counter');
-            const totalSlides = slides.length;
+            // Chart.js configurations (unchanged)
             const charts = {};
 
             function wrapLabels(label, maxWidth) {
@@ -225,7 +1701,7 @@
                         datasets: [{
                             label: 'Nivel de Impacto',
                             data: [85, 95, 75, 90, 100],
-                            backgroundColor: ['#FF6B6B', '#FFD166', '#06D6A0', '#118AB2', '#073B4C'],
+                            backgroundColor: ['#F04A4C', '#DEFF00', '#AEC800', '#106BA0', '#071E2D'], /* Updated colors */
                         }]
                     },
                     options: {
@@ -242,7 +1718,7 @@
                         labels: ['Componentes RStudio', 'Estructuras R', 'Funciones Tidyverse'],
                         datasets: [{
                             data: [30, 35, 35],
-                            backgroundColor: ['#118AB2', '#06D6A0', '#FFD166'],
+                            backgroundColor: ['#106BA0', '#AEC800', '#DEFF00'], /* Updated colors */
                             hoverOffset: 4
                         }]
                     },
@@ -260,54 +1736,104 @@
                 charts[canvasId] = new Chart(ctx, chartConfigs[canvasId]);
             }
 
-            function updateNav() {
-                slideCounter.textContent = `${currentSlide + 1} / ${totalSlides}`;
-                prevBtn.disabled = currentSlide === 0;
-                nextBtn.disabled = currentSlide === totalSlides - 1;
-                
-                if (currentSlide === 0) {
-                  prevBtn.style.visibility = 'hidden';
-                } else {
-                  prevBtn.style.visibility = 'visible';
+            // Initialize charts on page load if their canvases exist
+            initializeChart('applicationsChart');
+            initializeChart('skillsChart');
+
+            // Reusable function for slide navigation
+            function initSlides(containerId, prevBtnId, nextBtnId, counterId) {
+                let currentSlide = 0;
+                const slidesContainer = document.getElementById(containerId);
+                if (!slidesContainer) return; 
+                const slides = slidesContainer.querySelectorAll('.slide');
+                const prevBtn = document.getElementById(prevBtnId);
+                const nextBtn = document.getElementById(nextBtnId);
+                const slideCounter = document.getElementById(counterId);
+                const totalSlides = slides.length;
+
+                function updateNav() {
+                    if (!slideCounter || !prevBtn || !nextBtn) return;
+                    slideCounter.textContent = `${currentSlide + 1} / ${totalSlides}`;
+                    prevBtn.disabled = currentSlide === 0;
+                    nextBtn.disabled = currentSlide === totalSlides - 1;
+                    
+                    if (currentSlide === 0) {
+                      prevBtn.style.visibility = 'hidden';
+                    } else {
+                      prevBtn.style.visibility = 'visible';
+                    }
+
+                    if (currentSlide === totalSlides - 1) {
+                      nextBtn.textContent = 'Finalizar'; 
+                    } else {
+                      nextBtn.textContent = 'Siguiente';
+                    }
                 }
 
-                if (currentSlide === totalSlides - 1) {
-                  nextBtn.textContent = 'Finalizar';
-                } else {
-                  nextBtn.textContent = 'Siguiente';
-                }
-            }
+                function showSlide(index) {
+                    slides.forEach((slide, i) => {
+                        slide.classList.toggle('active', i === index);
+                    });
+                    
+                    const activeSlide = slides[index];
+                    const canvas = activeSlide.querySelector('canvas');
+                    if (canvas) {
+                        initializeChart(canvas.id); 
+                    }
 
-            function showSlide(index) {
-                slides.forEach((slide, i) => {
-                    slide.classList.toggle('active', i === index);
+                    updateNav();
+                }
+
+                prevBtn?.addEventListener('click', () => {
+                    if (currentSlide > 0) {
+                        currentSlide--;
+                        showSlide(currentSlide);
+                    }
+                });
+
+                nextBtn?.addEventListener('click', () => {
+                    if (currentSlide < totalSlides - 1) {
+                        currentSlide++;
+                        showSlide(currentSlide);
+                    }
                 });
                 
-                const activeSlide = slides[index];
-                const canvas = activeSlide.querySelector('canvas');
-                if (canvas) {
-                    initializeChart(canvas.id);
-                }
-
-                updateNav();
+                showSlide(currentSlide);
             }
 
+            // Initialize slides for Bienvenida section
+            initSlides('bienvenida-slides-container', 'prevBtnBienvenida', 'nextBtnBienvenida', 'slide-counter-bienvenida');
 
-            nextBtn.addEventListener('click', () => {
-                if (currentSlide < totalSlides - 1) {
-                    currentSlide++;
-                    showSlide(currentSlide);
-                }
-            });
+            // Initialize slides for Tema 1 section
+            initSlides('tema1-slides-container', 'prevBtnTema1', 'nextBtnTema1', 'slide-counter-tema1');
 
-            prevBtn.addEventListener('click', () => {
-                if (currentSlide > 0) {
-                    currentSlide--;
-                    showSlide(currentSlide);
-                }
-            });
-            
-            showSlide(currentSlide);
+            // Initialize slides for Tema 2 section
+            initSlides('tema2-slides-container', 'prevBtnTema2', 'nextBtnTema2', 'slide-counter-tema2');
+
+            // Initialize slides for Tema 3 section
+            initSlides('tema3-slides-container', 'prevBtnTema3', 'nextBtnTema3', 'slide-counter-tema3');
+
+            // Initialize slides for Tema 4 section
+            initSlides('tema4-slides-container', 'prevBtnTema4', 'nextBtnTema4', 'slide-counter-tema4');
+
+            // Initialize slides for Tema 5 section
+            initSlides('tema5-slides-container', 'prevBtnTema5', 'nextBtnTema5', 'slide-counter-tema5');
+
+            // Initialize slides for Tema 6 section
+            initSlides('tema6-slides-container', 'prevBtnTema6', 'nextBtnTema6', 'slide-counter-tema6');
+
+            // Initialize slides for Tema 7 (New Funciones) section
+            initSlides('tema7-slides-container', 'prevBtnTema7', 'nextBtnTema7', 'slide-counter-tema7');
+
+            // Initialize slides for Tema 8 (New Librerías) section
+            initSlides('tema8-slides-container', 'prevBtnTema8', 'nextBtnTema8', 'slide-counter-tema8');
+
+            // Initialize slides for Tema 9 (New Manipulación de datos con Tidyverse) section
+            initSlides('tema9-slides-container', 'prevBtnTema9', 'nextBtnTema9', 'slide-counter-tema9');
+
+            // Initialize slides for Reto section
+            initSlides('reto-slides-container', 'prevBtnReto', 'nextBtnReto', 'slide-counter-reto');
+
         });
     </script>
 </body>
