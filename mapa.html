@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vectores en R: La Investigación de Datos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #EBE6E0; /* Light Beige/Gray */
+            color: #071E2D; /* Dark Blue/Black */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+        .container-card {
+            background-color: #FFFFFF;
+            padding: 3rem;
+            border-radius: 1.25rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            max-width: 900px;
+            width: 100%;
+        }
+        .section-box {
+            background-color: #FFFFFF;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease-in-out;
+            cursor: default; /* No specific action on click, so default */
+            border: 1px solid #888888; /* Medium Gray border */
+        }
+        .section-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+        .title-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            line-height: 1;
+            color: #106BA0; /* Medium Blue for main icon */
+        }
+        .sub-heading {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #071E2D; /* Dark Blue/Black */
+            margin-bottom: 1.5rem;
+        }
+        .code-block {
+            background-color: #EBE6E0;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-family: monospace;
+            font-size: 0.95rem;
+            overflow-x: auto;
+            white-space: pre-wrap; /* Allows wrapping for long lines if needed */
+            margin-top: 1.5rem;
+            border: 1px solid #888888;
+            color: #071E2D;
+            line-height: 1.4;
+        }
+        .data-point {
+            background-color: #F04A4C; /* Red */
+            color: #FFFFFF;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            margin: 0.4rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 80px;
+            height: 50px;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        .data-point:hover {
+            background-color: #10BED2; /* Cyan on hover */
+            transform: translateY(-4px);
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
+        }
+        .emphasis-text {
+            color: #F04A4C; /* Red for key takeaways */
+            font-weight: 700;
+        }
+        .text-code-color {
+            color: #F04A4C; /* Red for code comments */
+        }
+        .vector-container {
+            border: 3px dashed #AEC800; /* Thicker Green dashed border */
+            padding: 1.5rem;
+            border-radius: 1.25rem;
+            background-color: rgba(222, 255, 0, 0.1); /* Very light yellow-green transparent background */
+            margin-top: 2.5rem;
+            position: relative;
+            box-shadow: inset 0 0 15px rgba(174, 200, 0, 0.3);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+        .vector-container::before {
+            content: "Colección Homogénea";
+            position: absolute;
+            top: -1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #AEC800;
+            color: #071E2D;
+            padding: 0.3rem 1rem;
+            border-radius: 0.6rem;
+            font-size: 0.9rem;
+            font-weight: 700;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+            white-space: nowrap;
+            z-index: 10;
+        }
+        .data-point-index {
+            position: absolute;
+            top: 0.2rem;
+            left: 0.2rem;
+            font-size: 0.6rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 400;
+        }
+        .sub-section-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #106BA0;
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            border-bottom: 2px solid #106BA0;
+            padding-bottom: 0.5rem;
+        }
+        .info-box {
+            background-color: #EBE6E0;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid #888888;
+            margin-top: 2rem;
+            text-align: left;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #071E2D;
+        }
+        .info-box ul {
+            list-style-type: disc;
+            margin-left: 1.25rem;
+            margin-top: 0.5rem;
+        }
+        .info-box li {
+            margin-bottom: 0.5rem;
+        }
+        .coercion-box {
+            background-color: #FFFFFF;
+            border: 2px solid #F04A4C; /* Red border */
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            color: #071E2D;
+        }
+        .coercion-step {
+            background-color: #EBE6E0;
+            border: 1px solid #888888;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #071E2D;
+            display: inline-block;
+            min-width: 150px;
+        }
+        .coercion-arrow {
+            font-size: 1.8rem;
+            color: #106BA0;
+            margin: 0.5rem 0;
+        }
+        /* New styles for collapsible sections */
+        .collapsible-header {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #106BA0; /* Medium Blue background for header */
+            color: #FFFFFF;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            margin-top: 2.5rem; /* Space from previous content */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background-color 0.3s ease;
+            text-align: left; /* Ensure text aligns left within flex */
+        }
+        .collapsible-header:hover {
+            background-color: #10BED2; /* Cyan on hover */
+        }
+        .collapsible-header .toggle-icon {
+            font-size: 1.8rem;
+            font-weight: bold;
+            line-height: 1;
+            transition: transform 0.3s ease;
+        }
+        .collapsible-content {
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+            max-height: 2000px; /* Large enough to cover content */
+            padding: 1.5rem 0; /* Add padding to content area */
+        }
+        .collapsible-content.hidden {
+            max-height: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-card">
+        <h2 class="text-4xl md:text-5xl font-black text-[#071E2D] text-center mb-10 leading-tight">Vectores en R: Las Pistas Fundamentales de la Investigación de Datos</h2>
+        <p class="text-center text-lg max-w-xl mx-auto mb-12 text-[#888888]">Los vectores son la estructura de datos más básica y esencial en R, ¡diseñados para almacenar una <span class="emphasis-text">secuencia ordenada de elementos del mismo tipo</span> que son las primeras pistas cruciales en cualquier investigación de datos!</p>
+
+        <div class="section-box flex flex-col items-center text-center">
+            <span class="title-icon">📊</span>
+            <h3 class="sub-heading">Vectores en R: Estructuras clave para el análisis de datos</h3>
+            <p class="text-md mb-4">En R, los vectores representan una secuencia ordenada de elementos del mismo tipo, permitiendo almacenar, manipular y analizar información de manera eficiente.</p>
+            
+            <div class="info-box">
+                <h4 class="font-bold text-lg text-[#071E2D] mb-2">Tipos de Evidencia (Datos) que pueden contener:</h4>
+                <ul>
+                    <li><span class="emphasis-text">Numéricos (integer o double):</span> Datos cuantitativos como edad, temperatura o tasas de incidencia.</li>
+                    <li><span class="emphasis-text">Caracteres (character):</span> Cadenas de texto como nombres de enfermedades, países o regiones.</li>
+                    <li><span class="emphasis-text">Lógicos (logical):</span> Valores TRUE o FALSE, usados para variables binarias como estado de vacunación.</li>
+                    <li><span class="emphasis-text">Fechas (Date):</span> Representación temporal de eventos como diagnóstico o recuperación.</li>
+                </ul>
+            </div>
+
+            <div class="collapsible-header" data-target="classification-content">
+                <h3 class="text-2xl font-bold text-white leading-tight">Clasificación de las Pistas</h3>
+                <span class="toggle-icon">−</span>
+            </div>
+            <div id="classification-content" class="collapsible-content w-full">
+                <div class="info-box w-full">
+                    <h4 class="font-bold text-lg text-[#071E2D] mb-2">Clasificación Principal:</h4>
+                    <ul>
+                        <li><span class="emphasis-text">Vectores Atómicos:</span> Todos sus elementos deben ser del mismo tipo de dato (numéricos, caracteres, lógicos, etc.). ¡Son el tipo de pista en la que nos centraremos para nuestra investigación!</li>
+                        <li><span class="emphasis-text">Listas:</span> Pueden contener elementos de diferentes tipos (ej., un número, una cadena de texto y otro vector), lo que les permite almacenar información más diversa y compleja.</li>
+                    </ul>
+                    <h4 class="font-bold text-lg text-[#071E2D] mt-4 mb-2">Sobre la ausencia de Pistas (NULL):</h4>
+                    <p class="text-md">Aunque <code class="bg-[#EBE6E0] p-1 rounded font-bold text-[#F04A4C]">NULL</code> no es propiamente un vector, en muchos casos se usa para representar una estructura sin elementos, funcionando como un vector de longitud cero. Sin embargo, en esta sección nos concentraremos en los vectores atómicos, dada su fundamental importancia para iniciar cualquier caso.</p>
+                </div>
+            </div>
+
+            <div class="collapsible-header" data-target="creation-content">
+                <h3 class="text-2xl font-bold text-white leading-tight">1️⃣ Recopilando Evidencia: Creación de Vectores en R</h3>
+                <span class="toggle-icon">−</span>
+            </div>
+            <div id="creation-content" class="collapsible-content w-full">
+                <p class="text-md mb-4 text-[#888888]">Para definir un vector, usamos la función <code class="bg-[#EBE6E0] p-1 rounded font-bold text-[#F04A4C]">c()</code> (de “combine” o "combinar") para concatenar varios elementos en una estructura única, ¡como recolectar todas las piezas de evidencia en un solo lugar para nuestro caso!</p>
+
+                <h4 class="font-bold text-xl mb-4 text-[#071E2D]">Pista Numérica: Tasas de Incidencia</h4>
+                <div class="code-block w-full text-left">
+                    <span class="text-code-color"># Vector numérico con tasas de incidencia de enfermedades infecciosas</span><br>
+                    <span>incidencia &lt;- c(120.5, 85.3, 35.7, 60.8)</span>
+                </div>
+                <div class="mt-8 w-full">
+                    <div class="vector-container flex flex-wrap justify-center">
+                        <div class="data-point"><span class="data-point-index">[1]</span>120.5</div>
+                        <div class="data-point"><span class="data-point-index">[2]</span>85.3</div>
+                        <div class="data-point"><span class="data-point-index">[3]</span>35.7</div>
+                        <div class="data-point"><span class="data-point-index">[4]</span>60.8</div>
+                    </div>
+                    <p class="text-sm mt-4 text-[#888888]">Todos los elementos son <span class="emphasis-text">Numéricos</span>, ¡cada cifra es un dato crucial!</p>
+                </div>
+                
+                <h4 class="font-bold text-xl mb-4 text-[#071E2D] mt-12">Pista de Texto: Nombres de Virus</h4>
+                <div class="code-block w-full text-left">
+                    <span class="text-code-color"># Vector de nombres de virus</span><br>
+                    <span>virus &lt;- c("SARS-CoV-2", "Dengue", "Zika", "Influenza")</span>
+                </div>
+                <div class="mt-8 w-full">
+                    <div class="vector-container flex flex-wrap justify-center">
+                        <div class="data-point"><span class="data-point-index">[1]</span>"SARS-CoV-2"</div>
+                        <div class="data-point"><span class="data-point-index">[2]</span>"Dengue"</div>
+                        <div class="data-point"><span class="data-point-index">[3]</span>"Zika"</div>
+                        <div class="data-point"><span class="data-point-index">[4]</span>"Influenza"</div>
+                    </div>
+                    <p class="text-sm mt-4 text-[#888888]">Todos los elementos son <span class="emphasis-text">Caracteres</span>, ¡nombres importantes en la escena del crimen!</p>
+                </div>
+
+                <h4 class="font-bold text-xl mb-4 text-[#071E2D] mt-12">Pista Lógica: Resistencia a Antibióticos</h4>
+                <div class="code-block w-full text-left">
+                    <span class="text-code-color"># Vector lógico de resistencia a antibióticos</span><br>
+                    <span>resistente &lt;- c(TRUE, FALSE, FALSE, TRUE)</span>
+                </div>
+                <div class="mt-8 w-full">
+                    <div class="vector-container flex flex-wrap justify-center">
+                        <div class="data-point"><span class="data-point-index">[1]</span>TRUE</div>
+                        <div class="data-point"><span class="data-point-index">[2]</span>FALSE</div>
+                        <div class="data-point"><span class="data-point-index">[3]</span>FALSE</div>
+                        <div class="data-point"><span class="data-point-index">[4]</span>TRUE</div>
+                    </div>
+                    <p class="text-sm mt-4 text-[#888888]">Todos los elementos son <span class="emphasis-text">Lógicos</span>, ¡verdadero o falso, no hay lugar para ambigüedades!</p>
+                </div>
+
+                <div class="info-box w-full">
+                    <h4 class="font-bold text-lg text-[#071E2D] mb-2">📌 Notas del Detective:</h4>
+                    <ul>
+                        <li>✔️ Los textos deben ir entre comillas, ¡como nombres en un informe oficial!</li>
+                        <li>✔️ Los valores numéricos pueden ser enteros o decimales, ¡precisión para las estadísticas del caso!</li>
+                        <li>✔️ Los valores <code class="font-bold">TRUE</code> y <code class="font-bold">FALSE</code> representan variables lógicas, ¡decisiones claras en la investigación!</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="collapsible-header" data-target="access-modify-content">
+                <h3 class="text-2xl font-bold text-white leading-tight">2️⃣ Examinando las Pistas: Acceso y Modificación de Elementos</h3>
+                <span class="toggle-icon">−</span>
+            </div>
+            <div id="access-modify-content" class="collapsible-content w-full">
+                <p class="text-md mb-4 text-[#888888]">Los elementos dentro de un vector pueden manipularse utilizando <span class="emphasis-text">índices entre corchetes <code class="bg-[#EBE6E0] p-1 rounded font-bold text-[#F04A4C]">[]</code></span>, ¡como encontrar un detalle específico en el archivo del caso o ajustar la información sobre la marcha!</p>
+                
+                <h4 class="font-bold text-xl mb-4 text-[#071E2D]">Acceso Individual:</h4>
+                <div class="code-block w-full text-left">
+                    <span>incidencia[2]  <span class="text-code-color"># Devuelve 85.3 - ¡La segunda pista en la lista!</span></span><br>
+                    <span>virus[4]       <span class="text-code-color"># Devuelve "Influenza" - ¡El cuarto nombre de nuestro sospechoso!</span></span>
+                </div>
+                <p class="text-sm mt-2 text-[#888888]">El índice indica la posición del elemento, empezando por 1, ¡nunca olvides el orden de las pistas!</p>
+
+                <h4 class="font-bold text-xl mb-4 text-[#071E2D] mt-8">Selección Múltiple:</h4>
+                <div class="code-block w-full text-left">
+                    <span>incidencia[c(1,3)]  <span class="text-code-color"># Devuelve 120.5 y 35.7 - ¡Analizando dos pistas clave al mismo tiempo!</span></span>
+                </div>
+                <p class="text-sm mt-2 text-[#888888]">Usa otro vector con los índices de los elementos deseados, ¡una selección estratégica de la evidencia!</p>
+
+                <h4 class="font-bold text-xl mb-4 text-[#071E2D] mt-8">Modificar Valores:</h4>
+                <div class="code-block w-full text-left">
+                    <span>incidencia[3] &lt;- 40.2  <span class="text-code-color"># Actualiza la incidencia del tercer elemento a 40.2 - ¡Corrigiendo un detalle en el informe!</span></span>
+                </div>
+                <p class="text-sm mt-2 text-[#888888]">Sobrescribe el valor en una posición específica, ¡para tener la información más actualizada del caso!</p>
+
+                <h4 class="font-bold text-xl mb-4 text-[#071E2D] mt-8">Agregar Nuevos Elementos:</h4>
+                <div class="code-block w-full text-left">
+                    <span>incidencia &lt;- c(incidencia, 75.6)  <span class="text-code-color"># Añade un nuevo valor al final del vector - ¡Una nueva pista aparece en la investigación!</span></span>
+                </div>
+                <p class="text-sm mt-2 text-[#888888]">La función <code class="bg-[#EBE6E0] p-1 rounded font-bold text-[#F04A4C]">c()</code> también sirve para extender vectores, ¡siempre hay espacio para más evidencia!</p>
+            </div>
+
+            <div class="collapsible-header" data-target="operations-content">
+                <h3 class="text-2xl font-bold text-white leading-tight">3️⃣ Descifrando Patrones: Operaciones Matemáticas con Vectores</h3>
+                <span class="toggle-icon">−</span>
+            </div>
+            <div id="operations-content" class="collapsible-content w-full">
+                <p class="text-md mb-4 text-[#888888]">Los vectores permiten realizar cálculos de manera eficiente a todos sus elementos, ¡revelando patrones y conexiones ocultas en la evidencia para descifrar el misterio!</p>
+                
+                <h4 class="font-bold text-xl mb-4 text-[#071E2D]">Ejemplos Comunes:</h4>
+                <div class="code-block w-full text-left">
+                    <span>incidencia + 5     <span class="text-code-color"># Suma 5 a cada elemento del vector 'incidencia' - ¡Ajustando las cifras del caso!</span></span><br>
+                    <span>mean(incidencia)   <span class="text-code-color"># Calcula la media de los valores en 'incidencia' - ¡Obteniendo el promedio de las pistas numéricas!</span></span><br>
+                    <span>length(virus)      <span class="text-code-color"># Devuelve la cantidad de elementos en el vector 'virus' - ¡Saber cuántos sospechosos tenemos!</span></span>
+                </div>
+                <p class="text-sm mt-2 text-[#888888]">Estas operaciones son vectorizadas, lo que las hace muy rápidas, ¡como un detective experimentado que procesa la información en segundos!</p>
+            </div>
+
+            <div class="collapsible-header" data-target="advantages-disadvantages-content">
+                <h3 class="text-2xl font-bold text-white leading-tight">4️⃣ El Kit de Herramientas del Detective: Ventajas y Desventajas de los Vectores</h3>
+                <span class="toggle-icon">−</span>
+            </div>
+            <div id="advantages-disadvantages-content" class="collapsible-content w-full">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                    <div class="info-box border-[#AEC800] text-left">
+                        <h4 class="font-bold text-lg text-[#AEC800] mb-2">✔️ Ventajas (Homogeneidad):</h4>
+                        <ul>
+                            <li><span class="font-bold">Optimización en cálculos matemáticos:</span> Se ejecutan de manera rápida en R, ¡velocidad para resolver el caso!</li>
+                            <li><span class="font-bold">Mayor eficiencia en el almacenamiento de datos:</span> Requieren menos memoria, ¡tu maletín de detective se mantiene ligero!</li>
+                            <li><span class="font-bold">Compatibilidad:</span> Funcionan directamente con funciones estadísticas y gráficas, ¡herramientas perfectas para el análisis forense de datos!</li>
+                        </ul>
+                    </div>
+                    <div class="info-box border-[#F04A4C] text-left">
+                        <h4 class="font-bold text-lg text-[#F04A4C] mb-2">❌ Desventajas:</h4>
+                        <ul>
+                            <li><span class="font-bold">No permiten combinar distintos tipos de datos:</span> Estrictamente homogéneos, ¡cada caso requiere un tipo específico de pista!</li>
+                            <li><span class="font-bold">Coerción Automática:</span> R convierte todo al mismo tipo si se mezclan (puede causar pérdida de información), ¡cuidado con las pistas que se "disfrazan"!</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 class="sub-section-title">Ejemplo de Falsa Pista: Coerción Automática</h3>
+                <p class="text-md mb-4 text-[#888888]">Si combinamos números y texto en un mismo vector, R transformará todos los elementos a un tipo de dato común (generalmente, el más "flexible", como caracter), ¡una 'falsa pista' que debemos entender para evitar errores en nuestra investigación y no acusar al inocente!</p>
+
+                <div class="coercion-box">
+                    <h4 class="font-bold text-xl text-[#071E2D] mb-4">Proceso de Coerción:</h4>
+                    <div class="flex flex-col items-center">
+                        <div class="coercion-step">
+                            <span>mi_vector &lt;- c(25, "Dengue", 42)</span><br>
+                            <span class="text-code-color"># Vector original con tipos mezclados</span>
+                        </div>
+                        <span class="coercion-arrow">↓</span>
+                        <div class="coercion-step bg-[#F04A4C] text-white">
+                            <span>Resultado de coerción:</span><br>
+                            <span class="font-bold">"25", "Dengue", "42"</span><br>
+                            <span class="text-xs opacity-80">(Tipo: Character - ¡Todo se convierte en texto!)</span>
+                        </div>
+                        <span class="coercion-arrow">↓</span>
+                        <div class="coercion-step">
+                            <span>str(mi_vector)</span><br>
+                            <span class="text-code-color"># Output: 'chr' - ¡El informe confirma que ahora son solo caracteres!</span>
+                        </div>
+                        <span class="coercion-arrow">↓</span>
+                        <h4 class="font-bold text-xl text-[#071E2D] mb-4 mt-4">Intentando revertir la pista falsa:</h4>
+                        <div class="coercion-step">
+                            <span>as.numeric(mi_vector)</span><br>
+                            <span class="text-code-color"># Intentando convertir a numérico</span>
+                        </div>
+                        <span class="coercion-arrow">↓</span>
+                        <div class="coercion-step bg-[#F04A4C] text-white">
+                            <span>Resultado:</span><br>
+                            <span class="font-bold">25, NA, 42</span><br>
+                            <span class="text-xs opacity-80">("Dengue" no es un número válido - ¡Pista perdida o ilegible!)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box w-full">
+                    <h4 class="font-bold text-lg text-[#071E2D] mb-2">📌 Conclusión del Caso:</h4>
+                    <ul>
+                        <li>✔️ <span class="emphasis-text">Vectores atómicos homogéneos:</span> óptimos para cálculos rápidos y almacenamiento eficiente, ¡son tus pistas más confiables!</li>
+                        <li>✔️ Es fundamental <span class="emphasis-text">verificar la coerción automática</span> para evitar errores en el procesamiento de datos, ¡no dejes que una falsa pista arruine tu investigación!</li>
+                        <li>Los vectores en R son la base de la manipulación de datos, permitiendo almacenar información, acceder a elementos específicos y realizar operaciones matemáticas. ¡Son esenciales para el análisis estadístico y epidemiológico, facilitando el manejo de grandes volúmenes de información como un verdadero detective de datos!</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const headers = document.querySelectorAll('.collapsible-header');
+
+            headers.forEach(header => {
+                header.addEventListener('click', () => {
+                    const targetId = header.dataset.target;
+                    const content = document.getElementById(targetId);
+                    const icon = header.querySelector('.toggle-icon');
+
+                    if (content) {
+                        content.classList.toggle('hidden');
+                        if (content.classList.contains('hidden')) {
+                            icon.textContent = '+';
+                        } else {
+                            icon.textContent = '−';
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
