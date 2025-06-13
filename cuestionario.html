@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario de R</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Light gray background */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+        .quiz-container {
+            background-color: #ffffff; /* White background */
+            border-radius: 1.5rem; /* More rounded corners */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Soft shadow */
+            padding: 2.5rem;
+            max-width: 800px;
+            width: 100%;
+            transition: all 0.3s ease-in-out;
+        }
+        .question-card {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: #f9fafb; /* Lighter background for question cards */
+            border-radius: 1rem;
+            border: 1px solid #e5e7eb;
+        }
+        .question-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #374151; /* Darker gray text */
+            margin-bottom: 1rem;
+        }
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            background-color: #ffffff;
+            font-size: 1rem;
+            color: #4b5563;
+        }
+        .option-label:hover {
+            border-color: #6366f1; /* Indigo hover */
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+        .option-label input[type="radio"] {
+            margin-right: 0.75rem;
+            accent-color: #6366f1; /* Indigo radio button */
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+        .submit-button {
+            background-image: linear-gradient(to right, #6366f1, #8b5cf6); /* Indigo to Violet gradient */
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            font-size: 1.125rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            border: none;
+            display: block;
+            width: fit-content;
+            margin: 2rem auto 0;
+        }
+        .submit-button:hover {
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+            transform: translateY(-2px);
+        }
+        .explanation {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            background-color: #e0f2fe; /* Light blue for explanation */
+            color: #0c4a6e; /* Darker blue text */
+            border: 1px solid #a7d9f7;
+            font-size: 0.95rem;
+        }
+        .correct-answer-feedback {
+            background-color: #d1fae5; /* Light green for correct */
+            border-color: #34d399;
+            color: #065f46;
+        }
+        .incorrect-answer-feedback {
+            background-color: #fee2e2; /* Light red for incorrect */
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .results-section {
+            padding: 2rem;
+            background-color: #eff6ff; /* Very light blue for results */
+            border-radius: 1rem;
+            text-align: center;
+            margin-top: 2rem;
+            border: 1px solid #bfdbfe;
+        }
+        .results-section h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e3a8a; /* Dark blue */
+            margin-bottom: 1rem;
+        }
+        .results-section p {
+            font-size: 1.25rem;
+            color: #3b82f6; /* Medium blue */
+            margin-bottom: 1.5rem;
+        }
+        .retake-button {
+            background-color: #3b82f6; /* Blue */
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            border: none;
+        }
+        .retake-button:hover {
+            background-color: #2563eb; /* Darker blue on hover */
+        }
+        .hide {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1 class="text-4xl font-extrabold text-center text-gray-800 mb-6">Cuestionario de R: Fundamentos</h1>
+        <form id="quizForm">
+            <!-- Questions will be dynamically loaded here -->
+        </form>
+        <button id="submitBtn" class="submit-button">Enviar Cuestionario</button>
+        <div id="results" class="results-section hide">
+            <h2>Resultados del Cuestionario</h2>
+            <p>Tu puntaje final es: <span id="score">0</span>/<span id="totalQuestions">0</span></p>
+            <button id="retakeBtn" class="retake-button">Volver a Intentar</button>
+        </div>
+    </div>
+
+    <script>
+        // Función para obtener la explicación de una pregunta
+        function getExplanation(questionName) {
+            switch (questionName) {
+                case 'q1':
+                    return 'R es una herramienta poderosa para el análisis de datos y la creación de visualizaciones.';
+                case 'q2':
+                    return 'El panel del Editor es donde escribes y organizas tu código R.';
+                case 'q3':
+                    return 'El tipo de dato `logical` se utiliza para representar valores booleanos (verdadero/falso).';
+                case 'q4':
+                    return 'El operador `<-` es el estándar y preferido para asignar valores a variables en R.';
+                case 'q5':
+                    return 'Un vector es una secuencia de elementos del mismo tipo de dato.';
+                case 'q6':
+                    return 'La función `mutate()` se utiliza para añadir nuevas variables a un data.frame.';
+                case 'q7':
+                    return 'El operador tubería `%>%` mejora la legibilidad y la eficiencia al encadenar múltiples operaciones.';
+                case 'q8':
+                    return '`dplyr` es una librería fundamental de Tidyverse para la manipulación de datos.';
+                case 'q9':
+                    return 'Las funciones en R requieren argumentos de entrada, un cuerpo con la lógica, y una salida definida.';
+                case 'q10':
+                    return 'La librería `readr` es la recomendada para importar y exportar archivos de texto delimitado como CSV.';
+                default:
+                    return '';
+            }
+        }
+
+        // Definición de las preguntas, opciones y respuestas correctas
+        const questions = [
+            {
+                name: 'q1',
+                question: '¿Cuál es el propósito principal del lenguaje de programación R en el ámbito del análisis de datos?',
+                options: [
+                    'Crear videojuegos',
+                    'Desarrollar aplicaciones móviles',
+                    'Análisis estadístico y visualización de datos',
+                    'Diseño de páginas web'
+                ],
+                correctAnswer: 'Análisis estadístico y visualización de datos'
+            },
+            {
+                name: 'q2',
+                question: 'En RStudio, ¿dónde se escribe y organiza el código R?',
+                options: [
+                    'Consola',
+                    'Panel de Gráficos',
+                    'Panel del Editor',
+                    'Panel de Ayuda'
+                ],
+                correctAnswer: 'Panel del Editor'
+            },
+            {
+                name: 'q3',
+                question: '¿Qué tipo de dato en R se utiliza para almacenar valores de verdadero o falso?',
+                options: [
+                    '`numeric`',
+                    '`character`',
+                    '`logical`',
+                    '`integer`'
+                ],
+                correctAnswer: '`logical`'
+            },
+            {
+                name: 'q4',
+                question: '¿Cuál es el operador más común y preferido para la asignación de valores a variables en R?',
+                options: [
+                    `'='`,
+                    `'<-'`,
+                    `'->'`,
+                    `':='`
+                ],
+                correctAnswer: `'<-'`
+            },
+            {
+                name: 'q5',
+                question: '¿Qué es un "vector" en R?',
+                options: [
+                    'Una tabla con filas y columnas',
+                    'Una secuencia de elementos del mismo tipo de dato',
+                    'Una función matemática compleja',
+                    'Un gráfico estadístico'
+                ],
+                correctAnswer: 'Una secuencia de elementos del mismo tipo de dato'
+            },
+            {
+                name: 'q6',
+                question: '¿Qué función de la librería `dplyr` se utiliza para añadir nuevas variables a un `data.frame`?',
+                options: [
+                    '`filter()`',
+                    '`select()`',
+                    '`arrange()`',
+                    '`mutate()`'
+                ],
+                correctAnswer: '`mutate()`'
+            },
+            {
+                name: 'q7',
+                question: '¿Qué beneficio principal ofrece el operador tubería (`%>%`) en R (del paquete `magrittr`)?',
+                options: [
+                    'Realizar operaciones matemáticas complejas',
+                    'Mejorar la legibilidad y la eficiencia al encadenar múltiples operaciones',
+                    'Exportar datos a formatos externos',
+                    'Crear nuevas librerías'
+                ],
+                correctAnswer: 'Mejorar la legibilidad y la eficiencia al encadenar múltiples operaciones'
+            },
+            {
+                name: 'q8',
+                question: '¿Cuál de las siguientes librerías es parte fundamental del "Tidyverse" y se enfoca en la manipulación de datos?',
+                options: [
+                    '`ggplot2`',
+                    '`shiny`',
+                    '`dplyr`',
+                    '`RMarkdown`'
+                ],
+                correctAnswer: '`dplyr`'
+            },
+            {
+                name: 'q9',
+                question: '¿Qué elementos son esenciales al definir una función en R?',
+                options: [
+                    'Solo un nombre y un cuerpo',
+                    'Argumentos de entrada, un cuerpo con la lógica, y una salida definida',
+                    'Solo un argumento de entrada',
+                    'Un archivo de texto externo'
+                ],
+                correctAnswer: 'Argumentos de entrada, un cuerpo con la lógica, y una salida definida'
+            },
+            {
+                name: 'q10',
+                question: '¿Qué librería de R se recomienda para importar y exportar archivos de texto delimitado como CSV de forma eficiente?',
+                options: [
+                    '`utils`',
+                    '`readxl`',
+                    '`readr`',
+                    '`foreign`'
+                ],
+                correctAnswer: '`readr`'
+            }
+        ];
+
+        const quizForm = document.getElementById('quizForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const resultsDiv = document.getElementById('results');
+        const scoreSpan = document.getElementById('score');
+        const totalQuestionsSpan = document.getElementById('totalQuestions');
+        const retakeBtn = document.getElementById('retakeBtn');
+
+        let userAnswers = {};
+
+        // Function to render the quiz questions
+        function renderQuiz() {
+            quizForm.innerHTML = ''; // Clear previous questions
+            questions.forEach((q, index) => {
+                const questionCard = document.createElement('div');
+                questionCard.classList.add('question-card');
+                questionCard.innerHTML = `
+                    <h3>${index + 1}. ${q.question}</h3>
+                    <div class="options-container" id="options-${q.name}">
+                        ${q.options.map(option => `
+                            <label class="option-label">
+                                <input type="radio" name="${q.name}" value="${option}">
+                                <span>${option}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                    <div id="explanation-${q.name}" class="explanation hide"></div>
+                `;
+                quizForm.appendChild(questionCard);
+
+                // Add event listener for radio button changes to store answers
+                const radioButtons = questionCard.querySelectorAll(`input[name="${q.name}"]`);
+                radioButtons.forEach(radio => {
+                    radio.addEventListener('change', (event) => {
+                        userAnswers[q.name] = event.target.value;
+                    });
+                });
+            });
+            totalQuestionsSpan.textContent = questions.length;
+            resultsDiv.classList.add('hide'); // Hide results when rendering quiz
+            submitBtn.classList.remove('hide'); // Show submit button
+            userAnswers = {}; // Reset user answers
+        }
+
+        // Function to check answers and display results
+        function checkQuiz() {
+            let score = 0;
+            questions.forEach(q => {
+                const selectedOption = userAnswers[q.name];
+                const explanationDiv = document.getElementById(`explanation-${q.name}`);
+                const optionsContainer = document.getElementById(`options-${q.name}`);
+
+                // Clear previous feedback classes
+                optionsContainer.querySelectorAll('.option-label').forEach(label => {
+                    label.classList.remove('correct-answer-feedback', 'incorrect-answer-feedback');
+                });
+
+                if (selectedOption === q.correctAnswer) {
+                    score++;
+                    // Highlight correct option in green
+                    const correctLabel = optionsContainer.querySelector(`input[value="${q.correctAnswer}"]`).closest('label');
+                    if (correctLabel) {
+                        correctLabel.classList.add('correct-answer-feedback');
+                    }
+                    explanationDiv.innerHTML = `<span class="font-bold">¡Correcto!</span> ${getExplanation(q.name)}`;
+                } else {
+                    // Highlight incorrect selected option in red
+                    if (selectedOption) {
+                        const incorrectLabel = optionsContainer.querySelector(`input[value="${selectedOption}"]`).closest('label');
+                        if (incorrectLabel) {
+                            incorrectLabel.classList.add('incorrect-answer-feedback');
+                        }
+                    }
+                    // Highlight the correct option in green
+                    const correctLabel = optionsContainer.querySelector(`input[value="${q.correctAnswer}"]`).closest('label');
+                    if (correctLabel) {
+                        correctLabel.classList.add('correct-answer-feedback');
+                    }
+                    explanationDiv.innerHTML = `<span class="font-bold">Incorrecto.</span> La respuesta correcta era: <span class="font-bold">"${q.correctAnswer}"</span>. ${getExplanation(q.name)}`;
+                }
+                explanationDiv.classList.remove('hide');
+            });
+
+            scoreSpan.textContent = score;
+            resultsDiv.classList.remove('hide'); // Show results
+            submitBtn.classList.add('hide'); // Hide submit button after checking
+        }
+
+        // Event listener for the submit button
+        submitBtn.addEventListener('click', (event) => {
+            event.preventDefault(); // Prevent form submission
+            checkQuiz();
+        });
+
+        // Event listener for the retake button
+        retakeBtn.addEventListener('click', () => {
+            renderQuiz(); // Re-render the quiz
+        });
+
+        // Initial render of the quiz when the page loads
+        document.addEventListener('DOMContentLoaded', renderQuiz);
+    </script>
+</body>
+</html>
